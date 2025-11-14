@@ -1,3 +1,67 @@
+/* Services page styles moved from template */
+
+/* Page-scoped improvements for a professional services hero */
+.services-hero-wrapper { position: relative; overflow: visible; }
+
+/* No decorative side image on Services page; keep hero text centered */
+.services-hero-wrapper .video-bg-content { position: relative; padding-right: 0; z-index: 10; }
+
+/* Ensure text itself remains interactive and selectable (make children accept pointer events) */
+.services-hero-wrapper .video-bg-content * { pointer-events: auto; }
+
+/* Stronger overlay for better contrast against background video/poster */
+.services-hero-wrapper .video-bg-overlay { background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.55)); }
+
+/* Heading & paragraph tweaks */
+.services-hero-wrapper .video-bg-content h1 { font-size: 2.5rem; line-height: 1.05; }
+.services-hero-wrapper .video-bg-content p  { opacity: 0.95; }
+
+/* Responsive: hide decorative image on narrower screens and free space for copy */
+@media (max-width: 1024px) {
+    .services-hero-wrapper .video-bg-content { background-image: none; padding-right: 0; }
+    .services-hero-wrapper .video-bg-content .max-w-7xl { max-width: 100%; padding-right: 1rem; }
+}
+
+@media (max-width: 640px) {
+    .services-hero-wrapper .video-bg { display: none; }
+    .services-hero-wrapper .video-bg-content { padding: 3rem 1rem; }
+}
+
+/* Service list card improvements */
+.service-card { border-radius: 12px; overflow: hidden; }
+.service-card img { display:block; width:100%; height:100%; object-fit:cover; }
+.service-card .group-hover\:bg { transition: background-color .2s ease; }
+.service-card .object-cover { height:100%; }
+
+/* soften heavy card shadows for a cleaner look */
+.service-card { box-shadow: 0 2px 6px rgba(16,24,40,0.06); }
+
+/* Image wrapper to enforce aspect ratio (4:3) with fallback */
+.image-wrapper { position: relative; overflow: hidden; background: #f3f4f6; }
+.image-wrapper img { width:100%; height:100%; object-fit:cover; display:block; }
+/* Preferred: modern browsers */
+.image-wrapper { aspect-ratio: 4 / 3; }
+/* Fallback for older browsers */
+.image-wrapper.fallback { height: 0; padding-bottom: 75%; }
+.image-wrapper.fallback img { position: absolute; top:0; left:0; height:100%; width:100%; }
+
+/* Prevent price from wrapping */
+.price-badge { white-space: nowrap; }
+
+/* Line clamp for descriptions (vendor + standard) */
+.line-clamp-3 { display: -webkit-box; -webkit-box-orient: vertical; line-clamp: 3; -webkit-line-clamp: 3; overflow: hidden; }
+
+/* CTA polish */
+.service-cta { padding: 0.6rem 1rem; border-radius: 10px; font-weight: 700; }
+.service-cta.primary { background: #0f766e; color: #fff; }
+.service-cta.secondary { background: #fff; color: #0f172a; border: 1px solid #e5e7eb; }
+
+/* Make overlay buttons more visible on mobile */
+@media (max-width: 640px) {
+    .service-card .group-hover\:opacity-100 { opacity: 1 !important; }
+    .service-card .image-wrapper { aspect-ratio: 16 / 9; }
+    .service-cta { padding: 0.5rem 0.75rem; font-size: 0.9rem; }
+}
 /* Services Container */
 .services-container {
     max-width: 1200px;
