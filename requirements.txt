@@ -1,0 +1,19 @@
+Django==4.2.7
+psycopg2-binary>=2.9
+dj-database-url>=1.0.0
+gunicorn>=20.1.0
+django-storages[boto3]>=1.13.1
+boto3>=1.26.0
+celery>=5.2.7
+redis>=4.5.1
+djangorestframework>=3.14.0
+qrcode>=7.3
+Pillow>=9.5.0
+
+# Dev and optional tools
+python-decouple>=3.8
+whitenoise>=6.4
+django-debug-toolbar
+pytest
+pytest-django
+twilio>=8.0.0

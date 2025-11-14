@@ -1,0 +1,493 @@
+{% extends 'base.html' %}
+{% block title %}My Profile - UH Care{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* * == UH CARE PROFESSIONAL PROFILE STYLES ==
+     * 1. Re-themed with UH Care brand colors.
+     * 2. Moved all inline styles to this block for maintainability.
+     * 3. Added professional, responsive form styling.
+     * 4. Created a clean, reusable sidebar card component.
+     */
+
+    :root {
+        /* UH Care Brand Palette */
+        --uh-blue: #004a99;
+        --uh-green: #009e4d;
+        --uh-red: #E60000;
+        --uh-blue-dark: #002d6b;
+
+        /* Theme Variable Mapping */
+        --primary: var(--uh-blue);
+        --secondary: var(--uh-green);
+        --accent: var(--uh-red);
+
+        /* UI Colors */
+        --bg-primary: #FFFFFF;
+        --bg-secondary: #F8F9FA;
+        --text-primary: #1C1C1E;
+        --text-secondary: #636366;
+        --border: #E5E5EA;
+        --shadow: rgba(0, 0, 0, 0.05);
+        --shadow-lg: rgba(0, 0, 0, 0.1);
+        --radius-lg: 12px;
+        --radius-md: 8px;
+    }
+
+    .profile-container {
+        max-width: 1100px; /* Increased max-width */
+        margin: 3rem auto;
+        padding: 0 2rem;
+    }
+    
+    .profile-header {
+        /* More professional, on-brand gradient */
+        background: linear-gradient(135deg, var(--uh-blue), var(--uh-blue-dark));
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        color: white;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        /* Added polish */
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        flex-shrink: 0; /* Prevent shrinking */
+    }
+    
+    .profile-info h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+    }
+    .profile-info p {
+        margin: 0;
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    .profile-info a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .profile-info a:hover {
+        text-decoration: underline;
+    }
+    .profile-info .muted {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-top: 0.25rem;
+    }
+    
+    .profile-layout {
+        /* Replaced inline style on .profile-card */
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .profile-sidebar {
+        /* Replaced inline style on <aside> */
+        flex: 1 1 300px;
+        max-width: 350px;
+    }
+
+    .profile-main {
+        /* Replaced inline style on <section> */
+        flex: 2 1 600px;
+        min-width: 0; /* Fix for flex-shrink issues */
+    }
+
+    /* Main content card for the form */
+    .profile-card {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        box-shadow: 0 2px 12px var(--shadow);
+        margin-bottom: 2rem;
+    }
+
+    /* Reusable sidebar info box */
+    .info-box {
+        background: var(--bg-secondary);
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1.5rem;
+    }
+    .info-box h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.75rem;
+    }
+    .info-box p {
+        margin: 0.5rem 0;
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+    }
+    .info-box p strong {
+        color: var(--text-primary);
+        display: block;
+        margin-bottom: 0.1rem;
+    }
+    .info-box a {
+        font-weight: 600;
+    }
+
+    /* Sidebar actions */
+    .sidebar-actions {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .sidebar-actions .btn {
+        width: 100%;
+    }
+
+    /* Form Section Styling */
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+    }
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .form-section h2 {
+        font-size: 1.5rem; /* Larger, clearer section title */
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        margin-top: 0;
+        color: var(--primary);
+    }
+    .form-section h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Form Layout - Replaces inline widths/floats */
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem; /* Default stacking margin */
+    }
+    .form-row .form-group {
+        margin-bottom: 0; /* Handled by 'gap' */
+    }
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    /* Form Element Styling */
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    /* Unified style for all inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="number"],
+    input[type="file"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-sizing: border-box; /* Ensures padding doesn't break layout */
+    }
+
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(0, 74, 153, 0.2);
+    }
+
+    input[type="file"] {
+        padding: 0.6rem 1rem;
+    }
+
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    /* Alert Styling */
+    .alert {
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: var(--radius-md);
+        border: 1px solid transparent;
+    }
+    .alert.success, .alert.alert-success {
+        background: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+    }
+    .alert.error, .alert.alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+    .alert.info, .alert.alert-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border-color: #bee5eb;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 900px) {
+        .profile-layout {
+            gap: 1.5rem;
+        }
+        .profile-sidebar {
+            flex-basis: 100%;
+            max-width: 100%;
+        }
+        .profile-main {
+            flex-basis: 100%;
+        }
+    }
+    @media (max-width: 600px) {
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 1.5rem;
+        }
+        .profile-card, .profile-header {
+            padding: 1.5rem;
+        }
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div id="profile-avatar" class="profile-avatar">
+            {% if user.profile_image %}
+                <img id="profile-avatar-img" src="{{ user.profile_image.url|default:user.profile_image }}" alt="{{ user.get_full_name }}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />
+            {% else %}
+                <div id="profile-avatar-initial" style="width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3rem;">{{ user.first_name.0|default:user.username.0|upper }}</div>
+            {% endif %}
+        </div>
+        <div class="profile-info">
+            <h1>{{ user.get_full_name }}</h1>
+            <p>{{ user.role|capfirst }} • <a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+            <p class="muted">Member since {{ user.date_joined|date:"F Y" }}</p>
+        </div>
+    </div>
+
+    <div class="profile-layout">
+        
+        <aside class="profile-sidebar">
+            <div class="info-box">
+                <h3>Contact Information</h3>
+                <p><strong>Phone:</strong> {{ user.phone_number|default:'Not set' }}</p>
+                <p><strong>Date of Birth:</strong> {% if user.date_of_birth %}{{ user.date_of_birth|date:'F j, Y' }}{% else %}Not set{% endif %}</p>
+                <p><strong>Emergency Contact:</strong> {{ user.emergency_contact|default:'Not set' }}</p>
+                <p><strong>Address:</strong> {{ user.address|default:'Not set' }}</p>
+            </div>
+
+            {% if profile and user.role == 'patient' %}
+            <div class="info-box">
+                <h3>Patient Summary</h3>
+                <p><strong>Blood Group:</strong> {{ profile.blood_group|default:'Not set' }}</p>
+                <p><strong>Outstanding Balance:</strong> NPR {{ profile.total_balance|floatformat:2 }}</p>
+                <p style="margin-top: 1rem;"><a href="{% url 'dashboard:patient_balance' %}">View financial summary</a></p>
+            </div>
+            {% elif profile and user.role == 'provider' %}
+            <div class="info-box">
+                <h3>Provider Summary</h3>
+                <p><strong>Specialization:</strong> {{ profile.get_specialization_display|default:profile.specialization }}</p>
+                <p><strong>Hourly Rate:</strong> NPR {{ profile.hourly_rate|floatformat:2 }}</p>
+                <p><strong>License:</strong> {{ profile.license_number|default:'Not set' }}</p>
+            </div>
+            {% endif %}
+
+            <div class="sidebar-actions">
+                <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Refresh Page</a>
+                <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-secondary">Change Password</a>
+            </div>
+        </aside>
+
+        <section class="profile-main">
+            <div class="profile-card">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert {{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="form-section">
+                        <h2>Basic Information</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.first_name.id_for_label }}">First name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.last_name.id_for_label }}">Last name</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.phone_number.id_for_label }}">Phone</label>
+                                {{ form.phone_number }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.profile_image.id_for_label }}">Profile Photo</label>
+                            {{ form.profile_image }}
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">Choose a square photo for best results. Preview will appear above.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>Additional Details</h2>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.date_of_birth.id_for_label }}">Date of birth</label>
+                            {{ form.date_of_birth }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.address.id_for_label }}">Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.emergency_contact.id_for_label }}">Emergency contact</label>
+                            {{ form.emergency_contact }}
+                        </div>
+                    </div>
+
+                    {% if user.role == 'patient' %}
+                    <div class="form-section">
+                        <h2>Patient Information</h2>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.medical_history.id_for_label }}">Medical history</label>
+                            {{ form.medical_history }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.blood_group.id_for_label }}">Blood group</label>
+                            {{ form.blood_group }}
+                        </div>
+                    </div>
+                    {% elif user.role == 'provider' %}
+                    <div class="form-section">
+                        <h2>Provider Information</h2>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.specialization.id_for_label }}">Specialization</label>
+                            {{ form.specialization }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.license_number.id_for_label }}">License number</label>
+                            {{ form.license_number }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.hourly_rate.id_for_label }}">Hourly rate (NPR)</label>
+                            {{ form.hourly_rate }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{% url 'dashboard:home' %}" class="btn btn-link">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+<script>
+// Client-side preview for profile image input
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.querySelector('input[name="profile_image"]');
+    if (!input) return;
+
+    input.addEventListener('change', function (e) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file (jpg, png, gif).');
+            input.value = '';
+            return;
+        }
+
+        // Create or update preview image
+        let img = document.getElementById('profile-avatar-img');
+        const initial = document.getElementById('profile-avatar-initial');
+
+        const url = URL.createObjectURL(file);
+        if (img) {
+            img.src = url;
+        } else {
+            // replace initial with an img element
+            const container = document.getElementById('profile-avatar');
+            if (!container) return;
+            img = document.createElement('img');
+            img.id = 'profile-avatar-img';
+            img.alt = 'Profile preview';
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.borderRadius = '50%';
+            img.style.objectFit = 'cover';
+            img.src = url;
+            if (initial) initial.remove();
+            container.appendChild(img);
+        }
+
+        img.onload = function () { URL.revokeObjectURL(url); };
+    });
+});
+</script>
+{% endblock %}

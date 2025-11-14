@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Appointments - UH Care{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-uh-blue-700">My Appointments</h1>
+        <p class="text-lg text-gray-600 mt-2">View and manage all your appointments</p>
+    </div>
+
+    <!-- Branded Filter Tabs -->
+    <div class="flex flex-wrap border-b border-gray-300 mb-8">
+        <a href="?status=all" class="py-3 px-5 font-medium border-b-2 -mb-px transition-all duration-200 {% if status_filter == 'all' or not status_filter %}text-uh-blue-700 border-uh-blue-700{% else %}text-gray-600 hover:text-uh-blue-700 border-transparent{% endif %}">All</a>
+        <a href="?status=pending" class="py-3 px-5 font-medium border-b-2 -mb-px transition-all duration-200 {% if status_filter == 'pending' %}text-uh-blue-700 border-uh-blue-700{% else %}text-gray-600 hover:text-uh-blue-700 border-transparent{% endif %}">Pending</a>
+        <a href="?status=confirmed" class="py-3 px-5 font-medium border-b-2 -mb-px transition-all duration-200 {% if status_filter == 'confirmed' %}text-uh-blue-700 border-uh-blue-700{% else %}text-gray-600 hover:text-uh-blue-700 border-transparent{% endif %}">Confirmed</a>
+        <a href="?status=completed" class="py-3 px-5 font-medium border-b-2 -mb-px transition-all duration-200 {% if status_filter == 'completed' %}text-uh-blue-700 border-uh-blue-700{% else %}text-gray-600 hover:text-uh-blue-700 border-transparent{% endif %}">Completed</a>
+        <a href="?status=cancelled" class="py-3 px-5 font-medium border-b-2 -mb-px transition-all duration-200 {% if status_filter == 'cancelled' %}text-uh-blue-700 border-uh-blue-700{% else %}text-gray-600 hover:text-uh-blue-700 border-transparent{% endif %}">Cancelled</a>
+    </div>
+
+    {% if appointments %}
+    <div class="space-y-6">
+        {% for appointment in appointments %}
+        <!-- Appointment Card -->
+        <article class="bg-white rounded-lg shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl grid grid-cols-1 md:grid-cols-[auto_1fr_auto] items-start gap-6 p-6 sm:p-8">
+            <!-- Date Block -->
+            <div class="text-center p-4 bg-uh-blue-100 rounded-lg w-full md:w-28">
+                <div class="text-4xl font-bold text-uh-blue-700 leading-none">{{ appointment.appointment_date|date:"d" }}</div>
+                <div class="text-sm font-medium text-uh-blue-600 uppercase mt-1">{{ appointment.appointment_date|date:"M Y" }}</div>
+                <div class="text-base font-semibold text-gray-800 mt-2">{{ appointment.appointment_time|time:"g:i A" }}</div>
+            </div>
+
+            <!-- Details -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ appointment.service.name }}</h3>
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-gray-600 text-sm mb-3">
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75"/></svg>
+                        {{ appointment.service.category.name }}
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ appointment.duration_hours }} hour(s)
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101"/></svg>
+                        <strong>रू {{ appointment.total_amount }}</strong>
+                    </span>
+                    {% if appointment.provider %}
+                    <span class="flex items-center gap-1.5">
+                        {% if appointment.provider and appointment.provider.profile_image %}
+                            <img src="{{ appointment.provider.profile_image.url|default:appointment.provider.profile_image }}" alt="{{ appointment.provider.get_full_name }}" class="h-6 w-6 rounded-full object-cover mr-2 inline-block" />
+                        {% else %}
+                            <img src="{% static 'images/avatar-placeholder.svg' %}" alt="{{ appointment.provider.get_full_name }}" class="h-6 w-6 rounded-full object-cover mr-2 inline-block" />
+                        {% endif %}
+                        <span class="font-medium text-gray-700">{{ appointment.provider.get_full_name }}</span>
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="text-sm text-gray-600 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-gray-500 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    {{ appointment.service_address|truncatewords:15 }}
+                </div>
+            </div>
+
+            <!-- Actions & Status -->
+            <div class="flex flex-col items-start md:items-end gap-3 w-full md:w-auto">
+                <span class="py-1 px-4 rounded-full text-xs font-semibold whitespace-nowrap {% if appointment.status == 'pending' %}bg-yellow-100 text-yellow-800{% elif appointment.status == 'confirmed' %}bg-uh-blue-100 text-uh-blue-700{% elif appointment.status == 'completed' %}bg-uh-green-100 text-uh-green-600{% elif appointment.status == 'cancelled' or appointment.status == 'rejected' %}bg-uh-red-100 text-uh-red-600{% else %}bg-gray-100 text-gray-800{% endif %}">{{ appointment.get_status_display }}</span>
+                <a href="{% url 'appointments:detail' appointment.id %}" class="w-full md:w-auto text-center bg-uh-blue-700 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">View Details</a>
+                {% if appointment.status == 'pending' or appointment.status == 'confirmed' and user.role == 'patient' %}
+                <button type="button" class="btn btn-danger open-cancel-modal w-full md:w-auto text-center bg-uh-red-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-uh-red-500 focus:outline-none focus:ring-2 focus:ring-uh-red-600 focus:ring-offset-2 transition-all duration-200" data-action-url="{% url 'appointments:cancel' appointment.id %}" data-appt-title="{{ appointment.service.name }} on {{ appointment.appointment_date|date:'M d' }}">Cancel</button>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center p-12 bg-white rounded-lg shadow-xl">
+        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5"/></svg>
+        <h3 class="text-2xl font-semibold text-gray-800 mb-2">No appointments found</h3>
+        <p class="text-gray-600 mb-6">You don't have any {{ status_filter }} appointments yet</p>
+        <a href="{% url 'services:list' %}" class="inline-block bg-uh-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">Browse Services</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('cancel-modal');
+    const cancelForm = document.getElementById('cancel-form');
+    const modalDesc = document.getElementById('cancel-modal-desc');
+    const closeBtn = document.getElementById('cancel-modal-close');
+
+    function openModal(actionUrl, title) {
+        if (!cancelForm || !modal) return;
+        cancelForm.action = actionUrl;
+        modalDesc.textContent = 'You are cancelling the appointment: ' + title + '. This action cannot be undone.';
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        const textarea = document.getElementById('cancellation_reason');
+        if (textarea) textarea.focus();
+    }
+
+    function closeModal() {
+        if (!cancelForm || !modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        cancelForm.action = '';
+        const textarea = document.getElementById('cancellation_reason');
+        if (textarea) textarea.value = '';
+    }
+
+    document.querySelectorAll('.open-cancel-modal').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+            const url = btn.getAttribute('data-action-url');
+            const title = btn.getAttribute('data-appt-title') || 'this appointment';
+            openModal(url, title);
+        });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    if (modal) {
+        modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+    }
+});
+</script>
+{% endblock %}

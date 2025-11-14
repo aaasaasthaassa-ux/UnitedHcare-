@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - UH Care{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="w-full bg-gray-100">
+  {% if post.featured_image %}
+  <div class="relative h-64 md:h-96 overflow-hidden">
+    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover brightness-75">
+    <div class="absolute inset-0 bg-black/40"></div>
+    <div class="absolute inset-0 flex items-center">
+      <div class="max-w-4xl mx-auto px-4 text-center text-white">
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">{{ post.title }}</h1>
+        {% if post.excerpt %}
+        <p class="mt-3 text-lg md:text-xl text-blue-100">{{ post.excerpt }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="bg-uh-blue-700 text-white py-16">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">{{ post.title }}</h1>
+      {% if post.excerpt %}
+      <p class="mt-3 text-lg md:text-xl text-blue-100">{{ post.excerpt }}</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Main content -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Article -->
+    <article class="lg:col-span-2 bg-white rounded-lg shadow-md p-8">
+      <div class="prose max-w-none">
+        {% if post.published_at %}
+        <p class="text-sm text-gray-500">Published: <time>{{ post.published_at|date:'F j, Y, g:i a' }}</time></p>
+        {% endif %}
+        <p class="text-sm text-gray-500">Author: {{ post.author.get_full_name|default:post.author.username }}</p>
+        <hr class="my-4" />
+
+        {% if post.content %}
+          {{ post.content|safe }}
+        {% else %}
+          <p class="text-gray-600">No content available.</p>
+        {% endif %}
+      </div>
+    </article>
+
+    <!-- Side meta panel -->
+    <aside class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-sm font-semibold text-gray-700">Post details</h3>
+      <dl class="mt-4 space-y-3 text-sm text-gray-600">
+        <div>
+          <dt class="font-medium text-gray-800">Title</dt>
+          <dd>{{ post.title }}</dd>
+        </div>
+        <div>
+          <dt class="font-medium text-gray-800">Slug</dt>
+          <dd class="break-words">{{ post.slug }}</dd>
+        </div>
+        <div>
+          <dt class="font-medium text-gray-800">Author</dt>
+          <dd>{{ post.author.get_full_name|default:post.author.username }}</dd>
+        </div>
+        <div>
+          <dt class="font-medium text-gray-800">Excerpt</dt>
+          <dd>{{ post.excerpt|default:'—' }}</dd>
+        </div>
+        <div>
+          <dt class="font-medium text-gray-800">Category</dt>
+          <dd>{% if post.category %}{{ post.category.name }}{% else %}Uncategorized{% endif %}</dd>
+        </div>
+        <div>
+          <dt class="font-medium text-gray-800">Status</dt>
+          <dd class="capitalize">{{ post.status }}</dd>
+        </div>
+        <div>
+          <dt class="font-medium text-gray-800">Published at</dt>
+          <dd>{% if post.published_at %}{{ post.published_at|date:'F j, Y g:i a' }}{% else %}—{% endif %}</dd>
+        </div>
+        <div>
+          <dt class="font-medium text-gray-800">Featured image</dt>
+          <dd>
+            {% if post.featured_image %}
+              <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-auto rounded-md mt-2">
+            {% else %}
+              <span class="text-gray-500">No image</span>
+            {% endif %}
+          </dd>
+        </div>
+      </dl>
+
+      <div class="mt-6">
+        <a href="{% url 'blog:list' %}" class="inline-block text-uh-blue-700 font-semibold">← Back to Blog</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+{% endblock %}
+

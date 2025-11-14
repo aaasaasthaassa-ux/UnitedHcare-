@@ -1,0 +1,27 @@
+/* UH CARE ABOUT PAGE STYLES */
+:root {
+    --uh-blue: #004a99;
+    --uh-blue-600: #003a7a;
+    --uh-green: #009e4d;
+    --uh-green-600: #007a3d;
+    --uh-green-100: #e6fff0;
+    --bg-secondary: #F8F9FA;
+    --shadow-lg: rgba(0, 0, 0, 0.08);
+}
+
+body { background-color: var(--bg-secondary); }
+
+.text-uh-blue-700 { color: var(--uh-blue); }
+.text-uh-blue-600 { color: var(--uh-blue-600); }
+.bg-uh-green-100 { background-color: var(--uh-green-100); }
+.text-uh-green-600 { color: var(--uh-green-600); }
+
+.shadow-xl { box-shadow: 0 10px 30px var(--shadow-lg); border-top: 5px solid var(--uh-blue); }
+
+a.font-medium.text-uh-blue-700 { color: var(--uh-blue); text-decoration: none; }
+ a.font-medium.text-uh-blue-700:hover { color: var(--uh-blue-600); text-decoration: underline; }
+
+.about-hero h1 { text-align: center; font-size: 2.25rem; margin-bottom: 0.75rem; }
+
+.space-y-3 li { padding-left: 0.5rem; border-left: 3px solid var(--uh-green-100); transition: border-color 0.3s; }
+.space-y-3 li:hover { border-left-color: var(--uh-green); }

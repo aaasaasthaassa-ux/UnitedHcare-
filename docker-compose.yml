@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: uhcare
+      POSTGRES_USER: uhcare
+      POSTGRES_PASSWORD: uhcare_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - '6379:6379'
+
+  web:
+    build: .
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    volumes:
+      - .:/app
+    ports:
+      - '8000:8000'
+    environment:
+      - DATABASE_URL=postgres://uhcare:uhcare_pass@db:5432/uhcare
+      - DJANGO_DEBUG=True
+      - DJANGO_SECRET_KEY=dev-secret
+      - DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  pgdata:

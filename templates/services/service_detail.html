@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ service.name }} - UH Care{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mx-auto py-0 sm:py-6 px-0 sm:px-0 lg:px-0">
+        <!-- Hero -->
+        <section class="relative w-full bg-gray-50">
+            <div class="relative h-72 sm:h-96 lg:h-[420px] overflow-hidden">
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" alt="{{ service.name }}" class="w-full h-full object-cover brightness-90" />
+                {% elif service.image_url %}
+                    <img src="{{ service.image_url }}" alt="{{ service.name }}" class="w-full h-full object-cover brightness-90" />
+                {% else %}
+                    <div class="w-full h-full bg-gradient-to-r from-uh-blue-600 to-uh-green-500"></div>
+                {% endif %}
+
+                <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/50"></div>
+
+                <div class="absolute inset-0 flex items-center">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                            <div class="lg:col-span-2 text-white">
+                                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight">{{ service.name }}</h1>
+                                <p class="mt-3 text-lg sm:text-xl text-white/90">{{ service.short_description|default:service.description|truncatechars:160 }}</p>
+
+                                <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                    <div class="inline-flex items-baseline gap-3">
+                                        <span class="text-3xl sm:text-4xl font-extrabold text-uh-green-100">{% if service.get_price_display %}{{ service.get_price_display }}{% else %}NPR {{ service.base_price }}{% endif %}</span>
+                                        <span class="text-sm text-white/80">per {{ service.get_duration_unit_display }}</span>
+                                    </div>
+
+                                    <a href="{% url 'appointments:book' service.id %}" class="inline-flex items-center justify-center bg-white text-uh-blue-700 font-semibold py-3 px-5 rounded-lg shadow-lg hover:scale-[1.02] transition-transform">
+                                        Book Now
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-1 hidden lg:block">
+                                <div class="bg-white/10 backdrop-blur-md rounded-xl p-4">
+                                    <div class="text-sm text-white/90 font-semibold">Trusted by patients</div>
+                                    <div class="mt-3 flex items-center gap-3">
+                                        <div class="w-14 h-14 flex items-center justify-center bg-white/10 rounded-md">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-8 h-8 text-white">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2l7 4v5c0 5-3.5 9-7 11-3.5-2-7-6-7-11V6l7-4z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.5 12.5l1.9 1.9L15.5 10" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="text-white font-bold">Certified Providers</div>
+                                            <div class="text-white/80 text-sm">Background-checked & licensed</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-sm text-gray-600 mb-8">
+            <a href="{% url 'accounts:home' %}" class="text-uh-blue-700 hover:text-uh-blue-600 font-medium">Home</a>
+            <span class="text-gray-400">/</span>
+            <a href="{% url 'services:list' %}" class="text-uh-blue-700 hover:text-uh-blue-600 font-medium">Services</a>
+            <span class="text-gray-400">/</span>
+            <a href="{% url 'services:list_by_category' service.category.slug %}" class="text-uh-blue-700 hover:text-uh-blue-600 font-medium">{{ service.category.name }}</a>
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-800 font-medium">{{ service.name|truncatechars:30 }}</span>
+        </nav>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow-xl overflow-hidden">
+                <!-- Hero Image -->
+                <div class="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200">
+                    {% if service.image %}
+                        <img src="{{ service.image.url }}" alt="{{ service.name }}" class="w-full h-full object-cover" />
+                    {% elif service.image_url %}
+                        <img src="{{ service.image_url }}" alt="{{ service.name }}" class="w-full h-full object-cover" />
+                    {% else %}
+                        <!-- Fallback Icon -->
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-uh-blue-600 to-uh-green-500">
+                            <!-- Icon: Medical Bag -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-24 h-24 text-white opacity-50">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-12v.75m0 3v.75m0 3v.75m0 3V18M9.75 6.75h4.5M9.75 12h4.5M9.75 17.25h4.5M4.5 3.75l-1.5 1.5M19.5 3.75l1.5 1.5M4.5 15.75l-1.5 1.5M19.5 15.75l1.5 1.5M4.125 6.375c-1.026.163-2.11.02-3.088-.519M4.125 6.375c.966-.54 2.062-.683 3.088-.519m0 9.25c-1.026-.163-2.11-.02-3.088.519m3.088.519c.966.54 2.062.683 3.088.519M5.625 9c-1.026.163-2.11.02-3.088-.519M5.625 9c.966-.54 2.062-.683 3.088-.519m0 3.75c-1.026-.163-2.11-.02-3.088.519m3.088.519c.966.54 2.062.683 3.088.519M8.25 12c-1.026.163-2.11.02-3.088-.519M8.25 12c.966-.54 2.062-.683 3.088-.519M12 15c-1.026.163-2.11.02-3.088-.519M12 15c.966-.54 2.062.683 3.088-.519m0-3.75c-1.026-.163-2.11-.02-3.088.519M12 11.25c.966-.54 2.062-.683 3.088-.519m0 9.25c-1.026.163-2.11.02-3.088-.519M12 20.25c.966-.54 2.062-.683 3.088-.519M15.75 15.75l1.5 1.5M18.375 6.375c1.026.163 2.11.02 3.088-.519M18.375 6.375c-.966-.54-2.062-.683-3.088-.519m0 9.25c1.026-.163 2.11-.02 3.088.519m-3.088.519c-.966.54-2.062.683-3.088.519M19.875 9c1.026.163 2.11.02 3.088-.519M19.875 9c-.966-.54-2.062-.683-3.088-.519m0 3.75c1.026-.163 2.11-.02 3.088.519m-3.088.519c-.966.54-2.062.683-3.088.s519" />
+                            </svg>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="p-6 sm:p-8">
+                    <span class="inline-block bg-uh-blue-100 text-uh-blue-700 font-semibold px-4 py-1 rounded-full text-sm mb-4">{{ service.category.name }}</span>
+                    <h1 class="text-4xl font-bold text-uh-blue-700 mb-4">{{ service.name }}</h1>
+                    <p class="text-xl text-gray-600 pb-8 mb-8 border-b border-gray-200">{{ service.short_description }}</p>
+                    
+                    <div class="mb-10">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">About This Service</h2>
+                        <p class="text-gray-700 leading-relaxed">{{ service.description }}</p>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">What's Included</h2>
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <ul class="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                                {% for item in service.what_included.splitlines %}
+                                    {% if item.strip %}
+                                    <li class="flex items-start gap-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="flex-shrink-0 w-6 h-6 text-uh-green-600 mt-0.5">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                        </svg>
+                                        <span class="text-gray-700">{{ item|safe }}</span>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    {% if service.requirements %}
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Requirements & Preparation</h2>
+                        <p class="text-gray-700 leading-relaxed">{{ service.requirements }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <aside class="lg:col-span-1 lg:sticky lg:top-24 h-fit">
+                <!-- Booking Card -->
+                <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8 mb-6">
+                        <div class="bg-uh-green-100 text-center rounded-lg p-6 mb-6">
+                        <div class="text-sm font-medium text-uh-green-700 uppercase tracking-wide">Price</div>
+                        <div class="text-5xl font-extrabold text-uh-green-600 my-2">{% if service.get_price_display %}{{ service.get_price_display }}{% else %}NPR {{ service.base_price }}{% endif %}</div>
+                        <div class="text-base text-gray-600">per {{ service.get_duration_unit_display }}</div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-4">
+                        {% if user.is_authenticated and user.role == 'patient' %}
+                            <a href="{% url 'appointments:book' service.id %}" class="w-full text-center bg-uh-blue-700 text-white font-semibold py-4 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-lg">
+                                Book Appointment
+                            </a>
+                            
+                            {% if in_wishlist %}
+                            <form method="post" action="{% url 'services:remove_from_wishlist' service.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-center bg-white text-gray-700 font-semibold py-4 px-6 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 text-lg flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-uh-red-600">
+                                      <path d="M11.645 20.91a.75.75 0 01-1.29 0C8.32 19.01 2.25 14.254 2.25 8.25 2.25 5.32 4.614 3 7.5 3c1.74 0 3.292.822 4.21 2.053C12.623 3.822 14.17 3 15.9 3c2.886 0 5.25 2.32 5.25 5.25 0 6.004-6.07 10.76-8.355 12.66z" />
+                                    </svg>
+                                    Remove from Wishlist
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="post" action="{% url 'services:add_to_wishlist' service.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-center bg-white text-gray-700 font-semibold py-4 px-6 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 text-lg flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                    </svg>
+                                    Add to Wishlist
+                                </button>
+                            </form>
+                            {% endif %}
+                        {% elif user.is_authenticated %}
+                            <p class="text-center text-gray-600">
+                                Only patients can book services
+                            </p>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="w-full text-center bg-uh-blue-700 text-white font-semibold py-4 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-lg">
+                                Login to Book
+                            </a>
+                            <a href="{% url 'accounts:register_patient' %}" class="w-full text-center bg-white text-gray-700 font-semibold py-4 px-6 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 text-lg">
+                                Create Account
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Info Card -->
+                <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Service Details</h3>
+                    <ul class="list-none m-0 p-0 divide-y divide-gray-200">
+                        <li class="flex justify-between items-center py-3">
+                            <span class="text-gray-600">Category</span>
+                            <span class="text-gray-800 font-medium">{{ service.category.name }}</span>
+                        </li>
+                        <li class="flex justify-between items-center py-3">
+                            <span class="text-gray-600">Duration Unit</span>
+                            <span class="text-gray-800 font-medium">{{ service.get_duration_unit_display }}</span>
+                        </li>
+                        <li class="flex justify-between items-center py-3">
+                            <span class="text-gray-600">Total Bookings</span>
+                            <span class="text-gray-800 font-medium">{{ service.total_bookings }}</span>
+                        </li>
+                        <li class="flex justify-between items-center py-3">
+                            <span class="text-gray-600">Available</span>
+                            <span class="text-gray-800 font-medium">
+                                {% if service.is_active %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-6 h-6 text-uh-green-600 inline-block">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                    <span class="ml-1">Yes</span>
+                                {% else %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-6 h-6 text-uh-red-600 inline-block">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    <span class="ml-1">No</span>
+                                {% endif %}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+        
+        <!-- Related Services -->
+        {% if related_services %}
+        <section class="mt-16 sm:mt-24 pt-12 border-t border-gray-200">
+            <h2 class="text-3xl font-bold text-uh-blue-700 mb-8 text-center">Related Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for related in related_services %}
+                <article class="bg-white rounded-lg shadow-xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl">
+                    <!-- Related Card Image: prefer uploaded image, then external URL, else placeholder -->
+                    <div class="h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+                        {% if related.image %}
+                            <img src="{{ related.image.url }}" alt="{{ related.name }}" class="w-full h-full object-cover" />
+                        {% elif related.image_url %}
+                            <img src="{{ related.image_url }}" alt="{{ related.name }}" class="w-full h-full object-cover" />
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-300">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75L8.25 8.25m0 7.5L15.75 8.25" />
+                                </svg>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="p-6 flex-grow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ related.name }}</h3>
+                        <p class="text-gray-600 text-sm mb-4">{{ related.short_description|truncatewords:15 }}</p>
+                    </div>
+                    
+                        <div class="p-6 pt-4 border-t border-gray-200 bg-gray-50">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xl text-uh-green-600">{% if related.get_price_display %}{{ related.get_price_display }}{% else %}NPR {{ related.base_price }}{% endif %} <span class="text-sm text-gray-500">per {{ related.get_duration_unit_display }}</span></span>
+                            <a href="{% url 'services:detail' related.slug %}" class="bg-white text-gray-700 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors duration-200">
+                                View
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Small styling improvements for service detail hero and cards */
+.service-cta-badge { background: linear-gradient(90deg, rgba(0,154,77,0.12), rgba(0,74,153,0.08)); padding: 0.5rem 0.75rem; border-radius: 8px; }
+.service-hero-stats { display:flex; gap:1rem; align-items:center; }
+.service-hero-stats .stat { background: rgba(255,255,255,0.06); padding:0.5rem 0.75rem; border-radius:8px; color: #fff; }
+@media (max-width: 1024px) {
+    .service-hero-stats { flex-direction: column; align-items: flex-start; }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ equipment.name }} - UH Care{% endblock %}
+
+{% block content %}
+  <div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+      <!-- Main Content -->
+      <div class="lg:col-span-2 bg-white rounded-lg shadow-xl p-6 sm:p-10">
+        <div class="w-full h-80 bg-gradient-to-br from-uh-blue-600 to-blue-400 rounded-lg flex items-center justify-center mb-8">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-32 h-32 opacity-80">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 01-2.25 2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 013 12V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25V12zM12 12.75V18m0 0l-3-3m3 3l3-3m-3-6h.008v.008H12V6.75z" />
+          </svg>
+        </div>
+
+        <div class="flex flex-wrap gap-3 mb-4">
+          {% if equipment.availability == 'rent' or equipment.availability == 'both' %}
+            <span class="py-1.5 px-4 rounded-full text-sm font-semibold bg-uh-blue-100 text-uh-blue-700">Available for Rent</span>
+          {% endif %}
+          {% if equipment.availability == 'buy' or equipment.availability == 'both' %}
+            <span class="py-1.5 px-4 rounded-full text-sm font-semibold bg-uh-green-100 text-uh-green-600">Available to Buy</span>
+          {% endif %}
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ equipment.name }}</h1>
+        <p class="text-lg text-gray-600 mb-8">{{ equipment.brand }} • Condition: <span class="font-medium">{{ equipment.get_condition_display }}</span></p>
+
+        <div class="pb-6 mb-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-uh-blue-700 mb-4">Description</h2>
+          <p class="text-gray-700 leading-relaxed">{{ equipment.description }}</p>
+        </div>
+
+        <div class="pb-6 mb-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-uh-blue-700 mb-4">Specifications</h2>
+          <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ equipment.specifications }}</p>
+        </div>
+
+        <div class="pb-6">
+          <h2 class="text-xl font-semibold text-uh-blue-700 mb-4">Usage Instructions</h2>
+          <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ equipment.usage_instructions }}</p>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="lg:col-span-1 space-y-8">
+        <div class="sticky top-8 space-y-8">
+          <div class="bg-white rounded-lg shadow-xl p-6">
+            <h3 class="text-2xl font-bold text-uh-blue-700 mb-6">Pricing & Ordering</h3>
+
+            <div class="space-y-6">
+              {% if equipment.rent_price_daily %}
+                <div class="p-5 bg-uh-blue-100 rounded-lg">
+                  <p class="text-sm font-medium text-uh-blue-700 mb-2">Rental Price</p>
+                  <p class="text-3xl font-extrabold text-uh-blue-700">रू {{ equipment.rent_price_daily }}<span class="text-lg font-medium">/day</span></p>
+                  {% if equipment.rent_price_weekly %}
+                    <p class="text-sm font-medium text-uh-blue-600 mt-2">Weekly: <span class="font-bold">रू {{ equipment.rent_price_weekly }}</span></p>
+                  {% endif %}
+                  {% if equipment.rent_price_monthly %}
+                    <p class="text-sm font-medium text-uh-blue-600">Monthly: <span class="font-bold">रू {{ equipment.rent_price_monthly }}</span></p>
+                  {% endif %}
+                  {% if equipment.security_deposit %}
+                    <p class="text-sm font-semibold text-uh-red-600 mt-3">Security Deposit: <span class="font-bold">रू {{ equipment.security_deposit }}</span></p>
+                  {% endif %}
+                </div>
+              {% endif %}
+
+              {% if equipment.purchase_price %}
+                <div class="p-5 bg-uh-green-100 rounded-lg">
+                  <p class="text-sm font-medium text-uh-green-600 mb-2">Purchase Price</p>
+                  <p class="text-3xl font-extrabold text-uh-green-600">रू {{ equipment.purchase_price }}</p>
+                </div>
+              {% endif %}
+            </div>
+
+            {% if user.is_authenticated and equipment.is_available and user.role != 'provider' %}
+              <div class="flex flex-col gap-4 mt-6">
+                {% if equipment.availability == 'rent' or equipment.availability == 'both' %}
+                  <a href="{% url 'equipment:rent' equipment.id %}" class="w-full text-center bg-uh-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-lg">Rent Equipment</a>
+                {% endif %}
+                {% if equipment.availability == 'buy' or equipment.availability == 'both' %}
+                  <a href="{% url 'equipment:buy' equipment.id %}" class="w-full text-center bg-uh-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-green-500 focus:outline-none focus:ring-2 focus:ring-uh-green-600 focus:ring-offset-2 transition-all duration-200 text-lg">Buy Equipment</a>
+                {% endif %}
+              </div>
+            {% elif user.is_authenticated and equipment.is_available and user.role == 'provider' %}
+              <p class="text-center text-gray-600 font-medium mt-6">Available for patients only</p>
+            {% elif not user.is_authenticated %}
+              <a href="{% url 'accounts:login' %}" class="w-full block text-center bg-uh-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-lg mt-6">Login to Order</a>
+            {% else %}
+              <p class="text-center text-uh-red-600 font-bold text-lg mt-6">Currently Unavailable</p>
+            {% endif %}
+          </div>
+
+          <div class="bg-white rounded-lg shadow-xl p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Details</h3>
+            <ul class="space-y-3">
+              <li class="flex justify-between py-3 border-b border-gray-200">
+                <span class="font-medium text-gray-600">Brand:</span>
+                <span class="font-semibold text-gray-900">{{ equipment.brand|default:"N/A" }}</span>
+              </li>
+              <li class="flex justify-between py-3 border-b border-gray-200">
+                <span class="font-medium text-gray-600">Condition:</span>
+                <span class="font-semibold text-gray-900">{{ equipment.get_condition_display }}</span>
+              </li>
+              <li class="flex justify-between py-3 border-b border-gray-200">
+                <span class="font-medium text-gray-600">Model:</span>
+                <span class="font-semibold text-gray-900">{{ equipment.model_number|default:"N/A" }}</span>
+              </li>
+              <li class="flex justify-between py-3">
+                <span class="font-medium text-gray-600">Available:</span>
+                <span class="font-semibold text-gray-900">{{ equipment.available_units }} units</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+{% endblock %}

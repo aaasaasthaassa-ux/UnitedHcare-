@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Medical Equipment - UH Care{% endblock %}
+
+{% block content %}
+        {% include 'partials/video_hero.html' with title="Medical Equipment" subtitle="Rent or buy medical equipment for home care" %}
+        
+        <!-- Main Content Area -->
+        <div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- Filters Sidebar -->
+            <aside class="lg:col-span-1 space-y-6">
+              <!-- Search Filter -->
+              <div class="bg-white rounded-lg shadow-xl p-5">
+                <form method="get">
+                  <input type="text" name="search" placeholder="Search equipment..." value="{{ search_query|default:'' }}" class="form-control">
+                </form>
+              </div>
+                    
+              <!-- Categories Filter -->
+              <div class="bg-white rounded-lg shadow-xl p-5">
+                <h3 class="text-lg font-semibold text-uh-blue-700 mb-4">Categories</h3>
+                <ul class="space-y-2">
+                  <li>
+                    <a href="{% url 'equipment:list' %}" 
+                       class="block font-medium transition-colors {% if not selected_category %}text-uh-blue-700 font-bold{% else %}text-gray-700 hover:text-uh-blue-600{% endif %}">
+                       All Equipment
+                    </a>
+                  </li>
+                  {% for category in categories %}
+                  <li>
+                    <a href="{% url 'equipment:list_by_category' category.slug %}"
+                       class="block font-medium transition-colors {% if selected_category.slug == category.slug %}text-uh-blue-700 font-bold{% else %}text-gray-700 hover:text-uh-blue-600{% endif %}">
+                       {{ category.name }}
+                    </a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+                    
+              <!-- Availability Filter -->
+              <div class="bg-white rounded-lg shadow-xl p-5">
+                <h3 class="text-lg font-semibold text-uh-blue-700 mb-4">Availability</h3>
+                <ul class="space-y-2">
+                  <!-- NOTE: You can add active state logic here if you pass 'availability' from context -->
+                  <li><a href="?availability=rent" class="block font-medium text-gray-700 hover:text-uh-blue-600 transition-colors">For Rent</a></li>
+                  <li><a href="?availability=buy" class="block font-medium text-gray-700 hover:text-uh-blue-600 transition-colors">For Sale</a></li>
+                  <li><a href="?availability=both" class="block font-medium text-gray-700 hover:text-uh-blue-600 transition-colors">Both</a></li>
+                </ul>
+              </div>
+            </aside>
+                
+            <!-- Equipment Grid -->
+            <main class="lg:col-span-3">
+              {% if equipment %}
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {% for item in equipment %}
+                <article class="bg-white rounded-lg shadow-xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                  
+                  <!-- Image / Fallback Icon -->
+                  {% if item.image_url %}
+                  <div class="h-56 w-full">
+                    <img src="{{ item.image_url }}" alt="{{ item.name }}" class="w-full h-full object-cover" />
+                  </div>
+                  {% else %}
+                  <!-- Professional Icon Fallback -->
+                  <div class="w-full h-56 bg-gradient-to-br from-uh-blue-600 to-blue-400 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-20 h-20 opacity-80">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 01-2.25 2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 013 12V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25V12zM12 12.75V18m0 0l-3-3m3 3l3-3m-3-6h.008v.008H12V6.75z" />
+                    </svg>
+                  </div>
+                  {% endif %}
+                            
+                  <div class="p-5 flex-grow flex flex-col">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ item.name }}</h3>
+                    <p class="text-sm text-gray-500 mb-3">{{ item.brand|default:"Medical Grade" }}</p>
+                                
+                    <!-- Branded Badges -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                      {% if item.availability == 'rent' or item.availability == 'both' %}
+                      <span class="py-1 px-3 rounded-full text-xs font-semibold bg-uh-blue-100 text-uh-blue-700">Available for Rent</span>
+                      {% endif %}
+                      {% if item.availability == 'buy' or item.availability == 'both' %}
+                      <span class="py-1 px-3 rounded-full text-xs font-semibold bg-uh-green-100 text-uh-green-600">Available to Buy</span>
+                      {% endif %}
+                    </div>
+                                
+                    <!-- Pricing -->
+                    <div class="space-y-1 mb-4">
+                      {% if item.rent_price_daily %}
+                      <p class="text-sm text-gray-700"><strong>Rent:</strong> <span class="font-bold text-gray-800">रू {{ item.rent_price_daily }}/day</span></p>
+                      {% endif %}
+                      {% if item.purchase_price %}
+                      <p class="text-sm text-gray-700"><strong>Buy:</strong> <span class="font-bold text-gray-800">रू {{ item.purchase_price }}</span></p>
+                      {% endif %}
+                    </div>
+                                
+                    <!-- Card Footer -->
+                    <div class="mt-auto pt-4 border-t border-gray-200 flex justify-between items-center">
+                      <span class="text-sm text-gray-600">{{ item.available_units }} available</span>
+                      <a href="{% url 'equipment:detail' item.slug %}" class="bg-uh-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">
+                          View Details
+                      </a>
+                    </div>
+                  </div>
+                </article>
+                {% endfor %}
+              </div>
+              {% else %}
+              <!-- Professional Empty State -->
+              <div class="text-center p-12 bg-white rounded-lg shadow-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <h3 class="text-2xl font-semibold text-gray-800 mb-2">No equipment found</h3>
+                <p class="text-gray-600">Try adjusting your search or filters to find what you're looking for.</p>
+              </div>
+              {% endif %}
+            </main>
+          </div>
+        </div>
+  <!-- end of migrated content -->
+
+{% endblock %}

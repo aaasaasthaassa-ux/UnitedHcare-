@@ -1,0 +1,181 @@
+{% load static %}
+
+{% block title %}Admin Dashboard - UH Care{% endblock %}
+
+{% block content %}
+<!-- 
+  This is a full HTML file for demonstration.
+  In your Django project, you will only need to copy the 
+  <style> block into your base.html <head> (if not already there)
+  and the contents of <div id="page-content">...</div> 
+  to replace your original HTML block.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use the title from your block -->
+    <title>Admin Dashboard - UH Care</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        // Configuration for Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'uh-blue': {
+                            '700': '#004a9e', // Darker Blue from logo
+                            '600': '#0056b3',
+                            '100': '#e6f0ff',
+                        },
+                        'uh-green': {
+                            '600': '#4CAF50', // Green from logo
+                            '500': '#66BB6A',
+                            '100': '#eaf7ea',
+                        },
+                        'uh-red': {
+                            '600': '#D32F2F', // Red from logo heartbeat
+                            '500': '#E53E3E',
+                            '100': '#fbe9e9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- 
+      Base styles (would be in your base.html)
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <!-- 
+                      ****************************************************
+                      * IMPORTANT: Replace 'YOUR_LOGO_URL_HERE.jpg'
+                      * with the public URL of your hosted logo.
+                      ****************************************************
+                    -->
+                    <img class="h-10 w-auto" 
+                         src="YOUR_LOGO_URL_HERE.jpg" 
+                         alt="UH Care Logo"
+                         onerror="this.src='https://placehold.co/150x40/004a9e/ffffff?text=UH+Care&font=inter'; this.onerror=null;">
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- This div wraps your actual page content -->
+    <div id="page-content">
+
+    <!-- This is your original &#123;% block content %&#125; -->
+        <div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+            
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-uh-blue-700">Admin Dashboard</h1>
+                <p class="text-lg text-gray-600 mt-2">Welcome! Here is a summary of your application.</p>
+            </div>
+            
+            <!-- Professional Stat Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                
+                <!-- Card 1: Total Users -->
+                <div class="bg-white rounded-lg shadow-xl p-6 flex items-center gap-5">
+                    <!-- Icon: Users -->
+                    <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-uh-blue-100 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-uh-blue-700">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.003c0 1.113.285 2.16.786 3.07M15 19.128a2.25 2.25 0 01-2.25-2.25v-.003c0-1.113-.285-2.16-.786-3.07M9 13.5v-3c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125v3c0 .621-.504 1.125-1.125 1.125h-3.75A1.125 1.125 0 019 13.5zM9 13.5V9.75M15 13.5V9.75M9 13.5v3c0 .621.504 1.125 1.125 1.125h3.75c.621 0 1.125.504 1.125 1.125v3c0 .621-.504 1.125-1.125 1.125h-3.75A1.125 1.125 0 019 16.5v-3z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-600">Total Users</div>
+                        <div class="text-3xl font-bold text-gray-900 mt-1">{{ stats.users_count }}</div>
+                    </div>
+                </div>
+                
+                <!-- Card 2: Total Services -->
+                <div class="bg-white rounded-lg shadow-xl p-6 flex items-center gap-5">
+                    <!-- Icon: Services (Clipboard) -->
+                    <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-uh-blue-100 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-uh-blue-700">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876V5.25a2.25 2.25 0 00-2.25-2.25h-1.5a2.25 2.25 0 00-2.25 2.25v.894m7.5 10.376l-4.5-4.5m0 0l-4.5 4.5m4.5-4.5v11.25" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-600">Total Services</div>
+                        <div class="text-3xl font-bold text-gray-900 mt-1">{{ stats.services_count }}</div>
+                    </div>
+                </div>
+                
+                <!-- Card 3: Pending Payments (Branded Green) -->
+                <div class="bg-white rounded-lg shadow-xl p-6 flex items-center gap-5">
+                    <!-- Icon: Payments (Banknotes) -->
+                    <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-uh-green-100 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-uh-green-600">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.75A.75.75 0 013 4.5h.75m0 0A.75.75 0 013.75 6v.75m0 0v-.75A.75.75 0 013.75 6h.75m0 0V4.5A.75.75 0 013.75 3h.75m0 0v.75A.75.75 0 013 4.5h-.75m0 0h-.75A.75.75 0 011.5 6v.75m0 0V6A.75.75 0 012.25 5.25h.75M3.75 15v.75A.75.75 0 013 16.5h-.75m0 0v-.75A.75.75 0 013 15h.75m0 0A.75.75 0 013.75 16.5v.75m0 0v-.75A.75.75 0 013.75 15h.75m0 0v-.75A.75.75 0 013.75 13.5h.75m0 0V15A.75.75 0 013.75 15h-.75m0 0h-.75A.75.75 0 011.5 16.5v.75m0 0V16.5A.75.75 0 012.25 15.75h.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-600">Pending Payments</div>
+                        <div class="text-3xl font-bold text-uh-green-600 mt-1">रू {{ stats.pending_payments_total }}</div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Recent Activity Section -->
+            <div>
+                <h2 class="text-2xl font-bold text-uh-blue-700 mb-4">Recent Activity</h2>
+                {% if recent_activity %}
+                    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+                        <ul class="divide-y divide-gray-200">
+                            {% for item in recent_activity %}
+                                <li class="px-6 py-4 text-sm text-gray-700">
+                                    {{ item }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    <!-- Professional Empty State -->
+                    <div class="text-center p-12 bg-white rounded-lg shadow-xl">
+                        <!-- Icon: Document Search -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                        </svg>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-2">No recent activity</h3>
+                        <p class="text-gray-600">The latest actions will appear here.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+        <!-- End of your original {% block content %} -->
+
+    </div> <!-- End #page-content -->
+
+</body>
+</html>

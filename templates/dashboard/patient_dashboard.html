@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Patient Dashboard - UH Care{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Clean, modern dashboard tweaks */
+  .uh-card { box-shadow: 0 6px 18px rgba(15,23,42,0.06); border-radius: 0.5rem; }
+  .status-badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:9999px;font-weight:600;font-size:0.75rem}
+  .muted { color:#6b7280 }
+  /* Video background helpers */
+  .video-bg-wrap { position:relative; overflow:hidden; border-radius:0.5rem; }
+  .video-bg-wrap video.video-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+  .video-bg-overlay { position:absolute; inset:0; background:linear-gradient(180deg, rgba(2,6,23,0.35), rgba(2,6,23,0.5)); z-index:1; }
+  .video-bg-content { position:relative; z-index:2; }
+  /* Hide video on small screens to save bandwidth */
+  @media (max-width: 767px) {
+    .video-bg-wrap video.video-bg { display:none; }
+    .video-bg-overlay { background: rgba(2,6,23,0.45); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+  <!-- Header -->
+  <div class="flex items-start justify-between gap-6 mb-8">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-uh-blue-700">Welcome back, {{ user.first_name|default:user.username|default:'Patient' }}!</h1>
+      <p class="mt-1 text-sm muted">Overview of your recent activity and account balance.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="{% url 'appointments:provider_directory' %}" class="bg-white border border-gray-200 text-sm px-4 py-2 rounded-lg hover:shadow">Find Provider</a>
+      <a href="{% url 'appointments:my_appointments' %}" class="bg-uh-blue-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-uh-blue-600">My Appointments</a>
+    </div>
+  </div>
+
+  <!-- Balance + Actions -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="lg:col-span-2 video-bg-wrap bg-gradient-to-r from-uh-blue-700 to-uh-blue-600 text-white p-6 uh-card">
+      <!-- Background video (static files: place Back-ground.mp4 under static/videos/) -->
+      <video class="video-bg" autoplay muted loop playsinline aria-hidden="true" poster="{% static 'images/dashboard-bg-poster.jpg' %}">
+        <source src="{% static 'videos/Back-ground.mp4' %}" type="video/mp4">
+        <!-- Fallback text for very old browsers -->
+      </video>
+      <div class="video-bg-overlay" aria-hidden="true"></div>
+      <div class="video-bg-content">
+        <h3 class="text-sm font-medium uppercase opacity-90">Current Balance</h3>
+        <div class="mt-2 flex items-center justify-between">
+          <div>
+            <div class="text-4xl font-extrabold">रु {{ stats.current_balance|default:0|floatformat:2|intcomma }}</div>
+            <div class="text-sm muted mt-1">{% if stats.pending_payments and stats.pending_payments > 0 %}{{ stats.pending_payments|intcomma }} pending payments{% else %}All payments cleared{% endif %}</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <a href="{% url 'dashboard:patient_balance' %}" class="bg-white text-uh-blue-700 px-4 py-2 rounded-lg font-semibold">View Details</a>
+            <a href="{% url 'payments:history' %}?status=unpaid" class="bg-uh-green-600 text-white px-4 py-2 rounded-lg font-semibold">Pay</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick summary cards -->
+    <div class="space-y-4">
+      <div class="bg-white p-4 uh-card flex items-center justify-between">
+        <div>
+          <div class="text-sm muted">Appointments</div>
+          <div class="text-lg font-bold">{{ stats.total_appointments|default:0 }}</div>
+        </div>
+        <a href="{% url 'appointments:my_appointments' %}" class="text-sm text-uh-blue-700">View</a>
+      </div>
+      <div class="bg-white p-4 uh-card flex items-center justify-between">
+        <div>
+          <div class="text-sm muted">Prescriptions</div>
+          <div class="text-lg font-bold">{{ stats.prescriptions_count|default:0 }}</div>
+        </div>
+        <a href="{% url 'pharmacy:my_orders' %}" class="text-sm text-uh-blue-700">View</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activities: Pharmacy | Equipment | Services -->
+  <div class="mb-6 flex items-center justify-between">
+    <h2 class="text-2xl font-bold text-uh-blue-700">Recent Activities</h2>
+    <p class="text-sm muted">Latest updates across orders, equipment and services</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Pharmacy Orders -->
+    <section class="bg-white p-6 uh-card">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold">Pharmacy Orders</h3>
+        <a href="{% url 'pharmacy:my_orders' %}" class="text-sm text-uh-blue-700">View All</a>
+      </div>
+      <div class="space-y-3">
+        {% if recent_pharmacy_orders %}
+          {% for order in recent_pharmacy_orders|slice:":3" %}
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-sm font-medium">Order: {{ order.order_number }}</div>
+                <div class="text-xs muted">{{ order.created_at|date:'M d, Y' }} • {{ order.get_status_display }}</div>
+              </div>
+              <div class="text-sm font-semibold">रु {{ order.total_amount|intcomma }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-sm muted">No recent pharmacy orders</div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- Equipment (Purchases / Rentals) -->
+    <section class="bg-white p-6 uh-card">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold">Equipment (Buy / Rent)</h3>
+        <a href="{% url 'equipment:my_purchases' %}" class="text-sm text-uh-blue-700">View All</a>
+      </div>
+      <div class="space-y-3">
+        {% if recent_purchases or recent_rentals %}
+          {% for purchase in recent_purchases|slice:":2" %}
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-sm font-medium">{{ purchase.equipment.name }}</div>
+                <div class="text-xs muted">{{ purchase.created_at|date:'M d, Y' }} • Qty: {{ purchase.quantity }}</div>
+              </div>
+              <div class="text-sm font-semibold">रु {{ purchase.total_amount|intcomma }}</div>
+            </div>
+          {% endfor %}
+          {% for rental in recent_rentals|slice:":1" %}
+            <div class="flex items-start justify-between pt-2 border-t border-gray-100">
+              <div>
+                <div class="text-sm font-medium">Rental: {{ rental.equipment.name }}</div>
+                <div class="text-xs muted">{{ rental.created_at|date:'M d, Y' }} • {{ rental.get_rental_period_display }}</div>
+              </div>
+              <div class="text-sm font-semibold">रु {{ rental.total_amount|intcomma }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-sm muted">No recent equipment activity</div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- Services Received -->
+    <section class="bg-white p-6 uh-card">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold">Services Received</h3>
+        <a href="{% url 'appointments:my_appointments' %}" class="text-sm text-uh-blue-700">View All</a>
+      </div>
+      <div class="space-y-3">
+        {% if recent_appointments %}
+          {% for appt in recent_appointments|slice:":3" %}
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-sm font-medium">{{ appt.service.name }}</div>
+                <div class="text-xs muted">{{ appt.appointment_date|date:'M d, Y' }} • {{ appt.get_status_display }}</div>
+              </div>
+              <div class="text-sm font-semibold">रु {{ appt.total_amount|intcomma }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-sm muted">No recent services</div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+</div>
+{% endblock %}

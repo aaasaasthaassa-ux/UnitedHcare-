@@ -1,0 +1,56 @@
+{% extends 'admin/change_list.html' %}
+{% load i18n %}
+
+{% block content %}
+<!-- 
+  UH Care Admin Theme:
+  This style block overrides the default Django admin button colors
+  to match your UH Care logo's blue. This makes the admin
+  feel more branded and professional without breaking the built-in styles.
+-->
+<style>
+    :root {
+        /* Define your brand colors from the logo */
+        --uh-blue-700: #004a9e; /* Dark Blue */
+        --uh-blue-600: #0056b3; /* Lighter Blue */
+        --uh-green-600: #4CAF50; /* Green */
+    }
+
+    /* Style the 'selected' filter button.
+     We use !important to safely override the default admin CSS. 
+    */
+    .button.selected,
+    .button.selected:hover,
+    .button.selected:active {
+        background-color: var(--uh-blue-700) !important;
+        color: #ffffff !important;
+        border-color: var(--uh-blue-700) !important;
+    }
+
+    /* Style the non-selected buttons on hover to match */
+    .button:not(.selected):hover,
+    .button:not(.selected):active {
+        background-color: var(--uh-blue-600) !important;
+        color: #ffffff !important;
+        border-color: var(--uh-blue-600) !important;
+    }
+</style>
+
+<!-- 
+  Your original button bar.
+  I've added 'flex-wrap: wrap' to ensure it looks good on
+  smaller screens without breaking the layout.
+-->
+<div style="margin-bottom:0.75rem; display:flex; flex-wrap: wrap; gap:0.5rem; align-items:center;">
+    {# Simple quick tabs to filter payments by linked domain. #}
+    {% with request.GET.linked as active %}
+        <a class="button{% if not active %} selected{% endif %}" href="?">All</a>
+        <a class="button{% if active == 'appointment' %} selected{% endif %}" href="?linked=appointment">Appointments</a>
+        <a class="button{% if active == 'pharmacy' %} selected{% endif %}" href="?linked=pharmacy">Pharmacy Orders</a>
+        <a class="button{% if active == 'purchase' %} selected{% endif %}" href="?linked=purchase">Equipment Purchases</a>
+        <a class="button{% if active == 'rental' %} selected{% endif %}" href="?linked=rental">Equipment Rentals</a>
+    {% endwith %}
+</div>
+
+{{ block.super }}
+{% endblock %}

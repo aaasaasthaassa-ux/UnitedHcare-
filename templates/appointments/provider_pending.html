@@ -1,0 +1,164 @@
+{% load static %}
+
+{% block title %}Pending Appointments - Provider - UH Care{% endblock %}
+
+{% block content %}
+<!-- 
+  This is a full HTML file for demonstration.
+  In your Django project, you will only need to copy the 
+  <style> block into your base.html <head> (if not already there)
+  and the contents of <div id="page-content">...</div> 
+  to replace your original HTML block.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use the title from your block -->
+    <title>Pending Appointments - Provider - UH Care</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        // Configuration for Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'uh-blue': {
+                            '700': '#004a9e', // Darker Blue from logo
+                            '600': '#0056b3',
+                            '100': '#e6f0ff',
+                        },
+                        'uh-green': {
+                            '600': '#4CAF50', // Green from logo
+                            '500': '#66BB6A',
+                            '100': '#eaf7ea',
+                        },
+                        'uh-red': {
+                            '600': '#D32F2F', // Red from logo heartbeat
+                            '500': '#E53E3E',
+                            '100': '#fbe9e9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- 
+      Base styles (would be in your base.html)
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <!-- 
+                      ****************************************************
+                      * IMPORTANT: Replace 'YOUR_LOGO_URL_HERE.jpg'
+                      * with the public URL of your hosted logo.
+                      ****************************************************
+                    -->
+                    <img class="h-10 w-auto" 
+                         src="YOUR_LOGO_URL_HERE.jpg" 
+                         alt="UH Care Logo"
+                         onerror="this.src='https://placehold.co/150x40/004a9e/ffffff?text=UH+Care&font=inter'; this.onerror=null;">
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- This div wraps your actual page content -->
+    <div id="page-content">
+
+    <!-- This is your original &#123;% block content %&#125; -->
+        <div class="max-w-5xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+            
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-uh-blue-700">Pending Appointments</h1>
+                <p class="text-lg text-gray-600 mt-2">Review and respond to new appointment requests.</p>
+            </div>
+        
+            {% if appointments %}
+                <div class="space-y-6">
+                    {% for ap in appointments %}
+                    <!-- Professional Appointment Card -->
+                    <article class="bg-white rounded-lg shadow-xl p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                        
+                        <!-- Details with Professional Icons -->
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ ap.service.name }}</h3>
+                            <div class="space-y-2">
+                                <!-- Patient Info -->
+                                <div class="flex items-center gap-2 text-gray-600 text-sm">
+                                    <!-- Icon: User -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-500 flex-shrink-0">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                    <span>Patient: <strong class="text-gray-800">{{ ap.patient.get_full_name }}</strong></span>
+                                </div>
+                                <!-- Schedule Info -->
+                                <div class="flex items-center gap-2 text-gray-600 text-sm">
+                                    <!-- Icon: Calendar -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-500 flex-shrink-0">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                    </svg>
+                                    <span>{{ ap.appointment_date|date:"F d, Y" }} at {{ ap.appointment_time|time:"g:i A" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Branded Action Buttons -->
+                        <div class="flex-shrink-0 flex sm:flex-col gap-3 w-full sm:w-auto">
+                            <!-- Accept Button (Green) -->
+                            <a href="{% url 'appointments:accept' ap.id %}" class="w-full sm:w-32 text-center bg-uh-green-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-uh-green-500 focus:outline-none focus:ring-2 focus:ring-uh-green-600 focus:ring-offset-2 transition-all duration-200">
+                                Accept
+                            </a>
+                            <!-- Reject Button (Red) -->
+                            <a href="{% url 'appointments:reject' ap.id %}" class="w-full sm:w-32 text-center bg-uh-red-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-uh-red-500 focus:outline-none focus:ring-2 focus:ring-uh-red-600 focus:ring-offset-2 transition-all duration-200">
+                                Reject
+                            </a>
+                        </div>
+
+                    </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Professional Empty State -->
+                <div class="text-center p-12 bg-white rounded-lg shadow-xl">
+                    <!-- Icon: Inbox -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.12-1.58H6.88a2.25 2.25 0 00-2.12 1.58L2.35 13.177a2.25 2.25 0 00-.1.661z" />
+                    </svg>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-2">No pending appointments</h3>
+                    <p class="text-gray-600">You are all caught up!</p>
+                </div>
+            {% endif %}
+        </div>
+        <!-- End of your original {% block content %} -->
+
+    </div> <!-- End #page-content -->
+
+</body>
+</html>

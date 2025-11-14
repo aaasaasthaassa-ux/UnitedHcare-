@@ -1,0 +1,185 @@
+{% load static %}
+
+{% block title %}Rental {{ rental.rental_number }} - UH Care{% endblock %}
+
+{% block content %}
+<!-- 
+  This is a full HTML file for demonstration.
+  In your Django project, you will only need to copy the 
+  <style> block into your base.html <head> (if not already there)
+  and the contents of <div id="page-content">...</div> 
+  to replace your original HTML block.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use the title from your block -->
+    <title>Rental {{ rental.rental_number }} - UH Care</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        // Configuration for Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'uh-blue': {
+                            '700': '#004a9e', // Darker Blue from logo
+                            '600': '#0056b3',
+                            '100': '#e6f0ff',
+                        },
+                        'uh-green': {
+                            '600': '#4CAF50', // Green from logo
+                            '500': '#66BB6A',
+                            '100': '#eaf7ea',
+                        },
+                        'uh-red': {
+                            '600': '#D32F2F', // Red from logo heartbeat
+                            '500': '#E53E3E',
+                            '100': '#fbe9e9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+  <!-- Compatibility stylesheet (plain CSS equivalents for common Tailwind @apply usages) -->
+  <link rel="stylesheet" href="{% static 'css/compat.css' %}">
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <!-- 
+                      ****************************************************
+                      * IMPORTANT: Replace 'YOUR_LOGO_URL_HERE.jpg'
+                      * with the public URL of your hosted logo.
+                      ****************************************************
+                    -->
+                    <img class="h-10 w-auto" 
+                         src="YOUR_LOGO_URL_HERE.jpg" 
+                         alt="UH Care Logo"
+                         onerror="this.src='https://placehold.co/150x40/004a9e/ffffff?text=UH+Care&font=inter'; this.onerror=null;">
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- This div wraps your actual page content -->
+    <div id="page-content">
+
+  <!-- This is your original &#123;% block content %&#125; -->
+        <div class="max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+          
+          <!-- Page Header -->
+          <h1 class="text-3xl font-bold text-uh-blue-700 mb-6">
+            Rental Details — {{ rental.rental_number }}
+          </h1>
+        
+          <!-- Main Content Card -->
+          <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+            <div class="p-6 sm:p-8">
+              
+              <!-- Card Header -->
+              <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
+                <div class="min-w-0">
+                  <h2 class="text-2xl font-semibold text-gray-900">{{ rental.equipment.name }}</h2>
+                  <p class="text-gray-600 mt-1">Requested on {{ rental.created_at|date:"F d, Y" }}</p>
+                </div>
+                <div class="text-left sm:text-right flex-shrink-0">
+                  <div class="text-2xl font-bold text-uh-green-600">रू {{ rental.total_amount }}</div>
+                  
+                  <!-- Branded Status Badge -->
+                  {% if rental.status == 'active' or rental.status == 'returned' %}
+                    <span class="mt-1 py-1 px-3 rounded-full text-xs font-semibold bg-uh-green-100 text-uh-green-600">
+                      {{ rental.get_status_display }}
+                    </span>
+                  {% elif rental.status == 'pending' %}
+                    <span class="mt-1 py-1 px-3 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                      {{ rental.get_status_display }}
+                    </span>
+                  {% elif rental.status == 'cancelled' %}
+                    <span class="mt-1 py-1 px-3 rounded-full text-xs font-semibold bg-uh-red-100 text-uh-red-600">
+                      {{ rental.get_status_display }}
+                    </span>
+                  {% else %}
+                    <span class="mt-1 py-1 px-3 rounded-full text-xs font-semibold bg-uh-blue-100 text-uh-blue-700">
+                      {{ rental.get_status_display }}
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+        
+              <!-- Divider -->
+              <hr class="my-6 border-t border-gray-200" />
+        
+              <!-- Details Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                <div>
+                  <span class="block text-sm font-medium text-gray-500">Rental Period</span>
+                  <span class="mt-1 block text-base font-semibold text-gray-900">{{ rental.get_rental_period_display }}</span>
+                </div>
+                <div>
+                  <span class="block text-sm font-medium text-gray-500">Quantity</span>
+                  <span class="mt-1 block text-base font-semibold text-gray-900">{{ rental.quantity }}</span>
+                </div>
+                <div>
+                  <span class="block text-sm font-medium text-gray-500">Start Date</span>
+                  <span class="mt-1 block text-base font-semibold text-gray-900">{{ rental.start_date|date:"F d, Y" }}</span>
+                </div>
+                <div>
+                  <span class="block text-sm font-medium text-gray-500">End Date</span>
+                  <span class="mt-1 block text-base font-semibold text-gray-900">{{ rental.end_date|date:"F d, Y" }}</span>
+                </div>
+                <div>
+                  <span class="block text-sm font-medium text-gray-500">Delivery Phone</span>
+                  <span class="mt-1 block text-base font-semibold text-gray-900">{{ rental.delivery_phone }}</span>
+                </div>
+                <div class="md:col-span-2">
+                  <span class="block text-sm font-medium text-gray-500">Delivery Address</span>
+                  <div class="mt-1 block text-base font-semibold text-gray-900 leading-relaxed">
+                    {{ rental.delivery_address|linebreaksbr }}
+                  </div>
+                </div>
+                {% if rental.customer_notes %}
+                <div class="md:col-span-2">
+                  <span class="block text-sm font-medium text-gray-500">Notes</span>
+                  <div class="mt-1 block text-base text-gray-800 bg-gray-50 p-3 rounded-md">
+                    {{ rental.customer_notes }}
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+        
+              <!-- Footer Action -->
+              <div class="mt-8 pt-6 border-t border-gray-200">
+                <a href="{% url 'equipment:my_rentals' %}" class="btn btn-secondary">
+                  &larr; Back to all rentals
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End of your original {% block content %} -->
+
+    </div> <!-- End #page-content -->
+
+</body>
+</html>

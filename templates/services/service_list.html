@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Services - UH Care{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page-scoped improvements for a professional services hero */
+    .services-hero-wrapper { position: relative; overflow: visible; }
+
+    /* No decorative side image on Services page; keep hero text centered */
+    .services-hero-wrapper .video-bg-content {
+        position: relative;
+        padding-right: 0;
+        z-index: 10;
+    }
+
+    /* Ensure text itself remains interactive and selectable (make children accept pointer events) */
+    .services-hero-wrapper .video-bg-content * { pointer-events: auto; }
+
+    /* Stronger overlay for better contrast against background video/poster */
+    .services-hero-wrapper .video-bg-overlay {
+        background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.55));
+    }
+
+    /* Heading & paragraph tweaks */
+    .services-hero-wrapper .video-bg-content h1 { font-size: 2.5rem; line-height: 1.05; }
+    .services-hero-wrapper .video-bg-content p  { opacity: 0.95; }
+
+    /* Responsive: hide decorative image on narrower screens and free space for copy */
+    @media (max-width: 1024px) {
+        .services-hero-wrapper .video-bg-content { background-image: none; padding-right: 0; }
+        .services-hero-wrapper .video-bg-content .max-w-7xl { max-width: 100%; padding-right: 1rem; }
+    }
+
+    @media (max-width: 640px) {
+        .services-hero-wrapper .video-bg { display: none; }
+        .services-hero-wrapper .video-bg-content { padding: 3rem 1rem; }
+    }
+    
+    /* Service list card improvements */
+    .service-card { border-radius: 12px; overflow: hidden; }
+    .service-card img { display:block; width:100%; height:100%; object-fit:cover; }
+    .service-card .group-hover\:bg { transition: background-color .2s ease; }
+    .service-card .object-cover { height:100%; }
+
+    /* Image wrapper to enforce aspect ratio (4:3) with fallback */
+    .image-wrapper { position: relative; overflow: hidden; background: #f3f4f6; }
+    .image-wrapper img { width:100%; height:100%; object-fit:cover; display:block; }
+    /* Preferred: modern browsers */
+    .image-wrapper { aspect-ratio: 4 / 3; }
+    /* Fallback for older browsers */
+    .image-wrapper.fallback { height: 0; padding-bottom: 75%; }
+    .image-wrapper.fallback img { position: absolute; top:0; left:0; height:100%; width:100%; }
+
+    /* Prevent price from wrapping */
+    .price-badge { white-space: nowrap; }
+
+    /* Line clamp for descriptions */
+    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* Make overlay buttons more visible on mobile */
+    @media (max-width: 640px) {
+        .service-card .group-hover\:opacity-100 { opacity: 1 !important; }
+        .service-card .image-wrapper { aspect-ratio: 16 / 9; }
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="services-hero-wrapper">
+    {% include 'partials/video_hero.html' with title="Our Healthcare Services" subtitle="Professional home healthcare services tailored to your needs" cta_text='Browse Services' cta_url='/services/' %}
+</div>
+
+<div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Sidebar Filters -->
+        <aside class="lg:sticky lg:top-24 h-fit">
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <!-- Search -->
+                <div class="relative mb-6">
+                    <form method="get" action="{% url 'services:list' %}">
+                        <!-- Search Icon -->
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                            </svg>
+                        </span>
+                        <input type="text" name="search" placeholder="Search services..." value="{{ search_query }}" 
+                               class="w-full pl-10 pr-4 py-2.5 border-gray-300 rounded-lg shadow-sm focus:ring-uh-blue-600 focus:border-uh-blue-600">
+                    </form>
+                </div>
+                
+                <!-- Categories -->
+                <div class="mb-6">
+                    <h3 class="text-base font-semibold text-gray-800 mb-3">Categories</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="{% url 'services:list' %}" class="flex justify-between items-center p-2 rounded-lg transition-colors {% if not selected_category %}bg-uh-blue-100 text-uh-blue-700 font-medium{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                                <span>All Services</span>
+                                <span class="text-xs font-medium {% if not selected_category %}bg-uh-blue-700 text-white{% else %}bg-gray-200 text-gray-700{% endif %} px-2 py-0.5 rounded-full">{{ services.paginator.count }}</span>
+                            </a>
+                        </li>
+                        {% for category in categories %}
+                        <li>
+                            <a href="{% url 'services:list_by_category' category.slug %}" 
+                               class="flex justify-between items-center p-2 rounded-lg transition-colors {% if selected_category.id == category.id %}bg-uh-blue-100 text-uh-blue-700 font-medium{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                                <span>{{ category.name }}</span>
+                                <span class="text-xs font-medium {% if selected_category.id == category.id %}bg-uh-blue-700 text-white{% else %}bg-gray-200 text-gray-700{% endif %} px-2 py-0.5 rounded-full">{{ category.services.count }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <!-- Sort Options -->
+                <div>
+                    <h3 class="text-base font-semibold text-gray-800 mb-3">Sort By</h3>
+                    <form method="get" id="sortForm">
+                        <select name="sort" onchange="this.form.submit()" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-uh-blue-600 focus:border-uh-blue-600">
+                            <option value="featured" {% if sort_by == 'featured' %}selected{% endif %}>Featured</option>
+                            <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Popular</option>
+                        </select>
+                        {% if search_query %}
+                        <input type="hidden" name="search" value="{{ search_query }}">
+                        {% endif %}
+                        <!-- This ensures category selection is maintained when sorting -->
+                        {% if selected_category %}
+                        <input type="hidden" name="category" value="{{ selected_category.slug }}">
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+            <main class="lg:col-span-3">
+            {% if services %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for service in services %}
+                <article class="service-card bg-white rounded-lg shadow-lg overflow-hidden relative group">
+                    <div class="relative image-wrapper bg-gray-100 overflow-hidden">
+                        {% if service.image %}
+                            <img src="{{ service.image.url }}" alt="{{ service.name }}" class="w-full h-full transform group-hover:scale-105 transition-transform duration-300" />
+                        {% elif service.image_url %}
+                            <img src="{{ service.image_url }}" alt="{{ service.name }}" class="w-full h-full transform group-hover:scale-105 transition-transform duration-300" />
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-300">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75L8.25 8.25m0 7.5L15.75 8.25" />
+                                </svg>
+                            </div>
+                        {% endif %}
+
+                        <!-- Overlay CTA on hover -->
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-200"></div>
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <div class="flex gap-3">
+                                <a href="{% url 'services:detail' service.slug %}" class="bg-white text-uh-blue-700 font-semibold py-2 px-4 rounded-lg shadow">View</a>
+                                <a href="{% url 'appointments:book' service.id %}" class="bg-uh-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow">Book</a>
+                            </div>
+                        </div>
+
+                        {% if service.is_featured %}
+                        <span class="absolute top-3 right-3 bg-uh-red-100 text-uh-red-600 text-xs font-semibold px-3 py-1 rounded-full">Featured</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="p-5">
+                        <span class="inline-block bg-uh-blue-100 text-uh-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">{{ service.category.name }}</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2 truncate" title="{{ service.name }}">{{ service.name }}</h3>
+
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-3">{{ service.short_description|truncatewords:20 }}</p>
+
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div>
+                                <div class="text-sm text-gray-500">Price</div>
+                                <div class="text-lg font-extrabold text-uh-green-600 price-badge">{% if service.get_price_display %}{{ service.get_price_display }}{% else %}NPR {{ service.base_price }}{% endif %}</div>
+                                <div class="text-xs text-gray-500">per {{ service.get_duration_unit_display }}</div>
+                            </div>
+                            <div>
+                                <a href="{% url 'services:detail' service.slug %}" class="inline-block bg-white text-gray-700 border border-gray-200 px-3 py-2 rounded-md shadow-sm hover:bg-gray-50">Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if services.has_other_pages %}
+            <nav class="flex justify-center items-center gap-2 mt-12 pt-8 border-t border-gray-200">
+                {% if services.has_previous %}
+                <a href="?page={{ services.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}"
+                   class="inline-flex items-center justify-center h-10 px-4 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors">
+                    ← Previous
+                </a>
+                {% endif %}
+                
+                {% for num in services.paginator.page_range %}
+                    {% if services.number == num %}
+                    <span class="inline-flex items-center justify-center h-10 w-10 text-sm font-medium text-white bg-uh-blue-700 border border-uh-blue-700 rounded-lg shadow-sm">{{ num }}</span>
+                    {% elif num > services.number|add:'-3' and num < services.number|add:'3' %}
+                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}"
+                       class="inline-flex items-center justify-center h-10 w-10 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors">
+                        {{ num }}
+                    </a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if services.has_next %}
+                <a href="?page={{ services.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}"
+                   class="inline-flex items-center justify-center h-10 px-4 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors">
+                    Next →
+                </a>
+                {% endif %}
+            </nav>
+            {% endif %}
+            
+            {% else %}
+            <!-- Professional Empty State -->
+            <div class="bg-white rounded-lg shadow-xl p-12 text-center">
+                <!-- Icon: Search -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto text-gray-300 mb-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">No services found</h3>
+                <p class="text-gray-600 mb-6">Try adjusting your search or filters to find what you're looking for.</p>
+                <a href="{% url 'services:list' %}" class="bg-uh-blue-700 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">
+                    Clear Filters
+                </a>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+{% endblock %}

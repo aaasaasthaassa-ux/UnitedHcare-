@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment - QR Code{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div class="p-6 sm:p-8">
+
+            <!-- Header -->
+            <div class="text-center">
+                <h1 class="text-2xl sm:text-3xl font-bold text-uh-blue-700">Pay for Appointment #{{ appointment.id }}</h1>
+                <p class="mt-4 text-lg text-gray-600">Please pay the following amount:</p>
+                <p class="text-5xl font-extrabold text-uh-green-600 my-4">रू {{ payment.amount }}</p>
+            </div>
+
+            <!-- QR Box -->
+            <div class="mt-8 text-center border-t border-gray-200 pt-8">
+                {% if qr_code_url %}
+                    <img src="{{ qr_code_url }}" alt="QR code" class="max-w-xs sm:max-w-sm w-full h-auto block mx-auto rounded-lg shadow-md" />
+                {% else %}
+                    {# Use project static QR image. Place your esewa QR at static/images/esewa-qr.png #}
+                    <img src="{% static 'images/esewa-qr.png' %}" alt="Default QR code" class="max-w-xs sm:max-w-sm w-full h-auto block mx-auto rounded-lg shadow-md" />
+                {% endif %}
+                
+                <p class="mt-6 text-lg font-semibold text-gray-800">Account: <strong>{{ account_name }}</strong></p>
+                <p class="text-base text-gray-600"><code>{{ account_number }}</code></p>
+
+                <!-- Instructions -->
+                <div class="mt-8 bg-uh-blue-100 text-uh-blue-700 p-5 rounded-lg text-left shadow">
+                    <h3 class="text-lg font-bold text-uh-blue-700 mb-2">How to pay:</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-sm sm:text-base">
+                        <li>Scan the QR code and pay the displayed amount.</li>
+                        <li>After payment, take a screenshot of the confirmation.</li>
+                        <li>Click the button below to upload the screenshot.</li>
+                        <li>Our team will verify your payment shortly.</li>
+                    </ol>
+                </div>
+
+                <!-- Action Button -->
+                <div class="mt-8">
+                    <a href="{% url 'payments:upload_proof' payment.id %}" 
+                       class="w-full sm:w-auto inline-block bg-uh-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-lg">
+                        I have paid (Upload proof)
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

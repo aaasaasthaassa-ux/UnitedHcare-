@@ -1,0 +1,275 @@
+{% load static %}
+    <!-- Styles moved to shared stylesheet: static/css/compat.css -->
+    <link rel="stylesheet" href="{% static 'css/compat.css' %}">
+    
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        // Configuration for Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'uh-blue': {
+                            '700': '#004a9e', // Darker Blue from logo
+                            '600': '#0056b3',
+                            '100': '#e6f0ff',
+                        },
+                        'uh-green': {
+                            '600': '#4CAF50', // Green from logo
+                            '100': '#eaf7ea',
+                        },
+                        'uh-red': {
+                            '600': '#D32F2F', // Red from logo heartbeat
+                            '500': '#E53E3E',
+                            '100': '#fbe9e9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Styles moved to shared stylesheet: static/css/compat.css -->
+    <link rel="stylesheet" href="{% static 'css/compat.css' %}">
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <!-- 
+                      ****************************************************
+                      * IMPORTANT: Replace 'YOUR_LOGO_URL_HERE.jpg'
+                      * with the public URL of your hosted logo.
+                      ****************************************************
+                    -->
+                    <img class="h-10 w-auto" 
+                         src="YOUR_LOGO_URL_HERE.jpg" 
+                         alt="UH Care Logo"
+                         onerror="this.src='https://placehold.co/150x40/004a9e/ffffff?text=UH+Care&font=inter'; this.onerror=null;">
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- This div wraps your actual page content -->
+    <div id="page-content">
+
+    <!-- This is your original &#123;% block content %&#125; -->
+        <div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+            
+            <!-- Page Header & Filters -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <!-- Page Title -->
+                <div>
+                    <h1 class="text-3xl font-bold text-uh-blue-700">My Appointments</h1>
+                    <p class="text-base text-gray-600 mt-2">Manage your upcoming and past personal appointments.</p>
+                </div>
+        
+                <!-- Filters & Actions -->
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <form method="get" class="flex items-center gap-2">
+                        <label for="status-filter" class="text-sm font-medium text-gray-700">Filter:</label>
+                        <select id="status-filter" name="status" class="form-select-filter" onchange="this.form.submit()">
+                            <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                            <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In progress</option>
+                            <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="cancelled_by_patient" {% if status_filter == 'cancelled_by_patient' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </form>
+        
+                    <a href="{% url 'appointments:provider_directory' %}" class="flex-shrink-0 text-center font-semibold text-gray-700 bg-white border border-gray-300 py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200">
+                        Find providers
+                    </a>
+                </div>
+            </div>
+
+            {% if appointments %}
+            <!-- Appointments Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {% for appt in appointments %}
+                <article class="bg-white rounded-lg shadow-xl overflow-hidden p-5 sm:p-6 transition-all duration-300 hover:shadow-2xl">
+                    <div class="flex gap-4">
+                        <!-- Provider Avatar -->
+                        <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                            {% if appt.provider.provider_profile and appt.provider.provider_profile.avatar_url %}
+                                <img src="{{ appt.provider.provider_profile.avatar_url }}" alt="{{ appt.provider.get_full_name }}" class="w-full h-full object-cover" />
+                            {% elif appt.provider.profile_image %}
+                                <img src="{{ appt.provider.profile_image.url|default:appt.provider.profile_image }}" alt="{{ appt.provider.get_full_name }}" class="w-full h-full object-cover" />
+                            {% else %}
+                                <img src="{% static 'images/avatar-placeholder.svg' %}" alt="{{ appt.provider.get_full_name }}" class="w-full h-full object-cover" />
+                            {% endif %}
+                        </div>
+        
+                        <!-- Appointment Info -->
+                        <div class="flex-1 min-w-0">
+                            <!-- Header: Name, Status, Cost -->
+                            <div class="flex justify-between items-start gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-lg font-bold text-gray-900 truncate" title="{{ appt.provider.get_full_name }}">{{ appt.provider.get_full_name }}</div>
+                                    <div class="text-sm text-gray-500">{{ appt.get_appointment_type_display }}</div>
+                                </div>
+                                <!-- Cost -->
+                                <div class="text-right flex-shrink-0">
+                                    <div class="font-bold text-uh-green-600 text-xl">रू {{ appt.total_fee }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Meta: Date, Time, Specialization -->
+                            <div class="mt-2 text-sm text-gray-600">
+                                <div>{{ appt.appointment_date|date:"M d, Y" }} • {{ appt.appointment_time|time:"g:i A" }}</div>
+                                {% if appt.provider.provider_profile.specialization %}
+                                    <div class="text-xs text-gray-500 mt-1">{{ appt.provider.provider_profile.specialization }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Status Badge -->
+                            <div class="mt-3">
+                                <span class="py-1 px-3 rounded-full text-xs font-semibold whitespace-nowrap
+                                    {% if appt.status == 'pending' %} bg-yellow-100 text-yellow-800 
+                                    {% elif appt.status == 'confirmed' %} bg-uh-blue-100 text-uh-blue-700
+                                    {% elif appt.status == 'in_progress' %} bg-blue-100 text-blue-800
+                                    {% elif appt.status == 'completed' %} bg-uh-green-100 text-uh-green-600
+                                    {% elif appt.status == 'cancelled_by_patient' or appt.status == 'cancelled_by_provider' %} bg-uh-red-100 text-uh-red-600
+                                    {% else %} bg-gray-100 text-gray-800 
+                                    {% endif %}">
+                                    {{ appt.get_status_display }}
+                                </span>
+                            </div>
+        
+                            <!-- Action Buttons -->
+                            <div class="mt-4 pt-4 border-t border-gray-200 flex items-center gap-2 flex-wrap">
+                                <a href="{% url 'appointments:personal_appointment_detail' appt.id %}" class="text-center bg-uh-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-sm">
+                                    View details
+                                </a>
+        
+                                {% if appt.status == 'pending' or appt.status == 'confirmed' %}
+                                    <button type="button" class="open-cancel-modal text-center bg-uh-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-uh-red-500 focus:outline-none focus:ring-2 focus:ring-uh-red-600 focus:ring-offset-2 transition-all duration-200 text-sm" 
+                                            data-action-url="{% url 'appointments:cancel_personal_appointment' appt.id %}" 
+                                            data-appt-title="{{ appt.provider.get_full_name }} on {{ appt.appointment_date|date:'M d' }}">
+                                        Cancel
+                                    </button>
+                                {% endif %}
+        
+                                {% if appt.can_review %}
+                                    <a href="{% url 'appointments:add_appointment_review' appt.id %}" class="text-center font-semibold text-gray-700 bg-white border border-gray-300 py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 text-sm">
+                                        Leave a review
+                                    </a>
+                                {% endif %}
+                            </div>
+        
+                            {% if appt.cancellation_reason %}
+                            <div class="mt-3 text-sm text-gray-500">
+                                <strong class="text-uh-red-600">Cancelled:</strong> {{ appt.cancellation_reason }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Professional Empty State -->
+            <div class="text-center p-12 bg-white rounded-lg shadow-xl">
+                <!-- Icon: Calendar -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+                <h3 class="text-2xl font-semibold text-gray-800 mb-2">No appointments found</h3>
+                <p class="text-gray-600 mb-6">You don't have any {{ status_filter }} appointments yet.</p>
+                <a href="{% url 'appointments:provider_directory' %}" class="inline-block bg-uh-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">
+                    Find Providers
+                </a>
+            </div>
+            {% endif %}
+        
+        </div>
+        <!-- End of your original {% block content %} -->
+
+    </div> <!-- End #page-content -->
+
+    <!-- 
+      Re-styled Cancellation Modal 
+    -->
+    <div id="cancel-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-60 transition-opacity duration-300 p-4">
+        <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-lg w-full">
+            <h3 class="text-2xl font-bold text-uh-blue-700 mb-2">Cancel Appointment</h3>
+            <p id="cancel-modal-desc" class="text-gray-600 mb-6">Please confirm you want to cancel this appointment.</p>
+    
+            <form id="cancel-form" method="post" action="">
+                {% csrf_token %}
+                <div>
+                    <label for="cancellation_reason" class="form-label">Reason (optional)</label>
+                    <textarea id="cancellation_reason" name="cancellation_reason" rows="3" class="form-control" placeholder="Optional note for provider"></textarea>
+                </div>
+    
+                <div class="flex gap-4 justify-end mt-8">
+                    <!-- Secondary Button -->
+                    <button type="button" class="font-semibold text-gray-700 bg-white border border-gray-300 py-2 px-5 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200" id="cancel-modal-close">
+                        Close
+                    </button>
+                    <!-- Danger Button -->
+                    <button type="submit" class="bg-uh-red-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-uh-red-500 focus:outline-none focus:ring-2 focus:ring-uh-red-600 focus:ring-offset-2 transition-all duration-200">
+                        Confirm Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 
+      Your original JavaScript.
+      Updated to toggle Tailwind's 'hidden' class instead of inline styles.
+    -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('cancel-modal');
+        const cancelForm = document.getElementById('cancel-form');
+        const modalDesc = document.getElementById('cancel-modal-desc');
+        const closeBtn = document.getElementById('cancel-modal-close');
+
+        function openModal(actionUrl, title) {
+            cancelForm.action = actionUrl;
+            modalDesc.textContent = 'You are cancelling the appointment with ' + title + '. This action cannot be undone.';
+            modal.classList.remove('hidden'); // Use Tailwind class
+            modal.classList.add('flex');     // Use Tailwind class
+            document.getElementById('cancellation_reason').focus();
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');   // Use Tailwind class
+            modal.classList.remove('flex');  // Use Tailwind class
+            cancelForm.action = '';
+            document.getElementById('cancellation_reason').value = '';
+        }
+
+        document.querySelectorAll('.open-cancel-modal').forEach(function(btn){
+            btn.addEventListener('click', function(e){
+                const url = btn.getAttribute('data-action-url');
+                const title = btn.getAttribute('data-appt-title') || 'this appointment';
+                openModal(url, title);
+            });
+        });
+
+        closeBtn.addEventListener('click', closeModal);
+
+        // close modal when clicking outside
+        modal.addEventListener('click', function(e){
+            if (e.target === modal) closeModal();
+        });
+    });
+    </script>
+</body>
+</html>

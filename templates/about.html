@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - UH Care{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8 about-hero">
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden p-8 md:p-12">
+
+        <h1 class="text-3xl sm:text-4xl font-bold text-uh-blue-700 mb-4">About UH Care</h1>
+
+        {% include 'partials/video_hero.html' with title="About UH Care" subtitle="Professional home healthcare services across Nepal" video_path='videos/about-hero.mp4' poster_path='images/about-hero-poster.jpg' %}
+
+        <p class="text-xl text-gray-600 mb-8 pt-6 border-t border-gray-100 text-center">
+            UH Care (United Home Care) provides professional home healthcare services across Nepal. We connect patients with qualified providers, deliver medical equipment to your doorstep, and ensure safe pharmacy delivery.
+        </p>
+
+    </div>
+</div>
+{% endblock %}

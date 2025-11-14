@@ -1,0 +1,463 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Services - UH Care{% endblock %}
+
+{% block extra_css %}
+<style>
+    .services-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 3rem 0;
+        color: white;
+        text-align: center;
+    }
+    
+    .services-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .services-container {
+        max-width: 1400px;
+        margin: 3rem auto;
+        padding: 0 2rem;
+    }
+    
+    .services-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2rem;
+    }
+    
+    /* Sidebar Filters */
+    .filters-sidebar {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        height: fit-content;
+        position: sticky;
+        top: 100px;
+        box-shadow: 0 2px 12px var(--shadow);
+    }
+    
+    .filter-section {
+        margin-bottom: 2rem;
+    }
+    
+    .filter-section h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+    
+    .filter-section ul {
+        list-style: none;
+    }
+    
+    .filter-section li {
+        margin-bottom: 0.75rem;
+    }
+    
+    .filter-section a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem;
+        border-radius: var(--radius-sm);
+        transition: all 0.2s;
+    }
+    
+    .filter-section a:hover,
+    .filter-section a.active {
+        background: var(--bg-secondary);
+        color: var(--primary);
+    }
+    
+    .search-box {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    
+    .search-box input {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 2.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 0.9375rem;
+    }
+    
+    .search-box::before {
+        content: '🔍';
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    /* Main Content */
+    .services-main {
+        min-height: 500px;
+    }
+    
+    .services-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .results-count {
+        color: var(--text-secondary);
+        font-size: 0.9375rem;
+    }
+    
+    .sort-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .sort-dropdown select {
+        padding: 0.5rem 2rem 0.5rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 0.9375rem;
+        background: var(--bg-primary);
+        cursor: pointer;
+    }
+    
+    /* Service Grid */
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
+    }
+    
+    .service-card {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: 0 2px 12px var(--shadow);
+        transition: all 0.3s;
+        position: relative;
+    }
+    
+    .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 32px var(--shadow-lg);
+    }
+    
+    .service-image {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        position: relative;
+    }
+
+    /* Gradient variants used for cards (use classes instead of inline cycle) */
+    .gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .gradient-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .gradient-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    
+    .service-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--secondary);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .wishlist-btn {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .wishlist-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    .wishlist-btn.active {
+        color: #FF3B30;
+    }
+    
+    .service-content {
+        padding: 1.5rem;
+    }
+    
+    .service-category {
+        color: var(--primary);
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+    }
+    
+    .service-content h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+    }
+    
+    .service-content p {
+        color: var(--text-secondary);
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .service-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+    
+    .service-price {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .price-amount {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    
+    .price-unit {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+    
+    .no-services {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    
+    .no-services h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+    
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 3rem;
+        list-style: none;
+    }
+    
+    .pagination a,
+    .pagination span {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .pagination a:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    .pagination .current {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    @media (max-width: 1024px) {
+        .services-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .filters-sidebar {
+            position: static;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="services-header">
+    <div class="container">
+        <h1>Our Healthcare Services</h1>
+        <p>Professional home healthcare services tailored to your needs</p>
+    </div>
+</div>
+
+<div class="services-container">
+    <div class="services-layout">
+        <!-- Sidebar Filters -->
+        <aside class="filters-sidebar">
+            <!-- Search -->
+            <div class="search-box">
+                <form method="get" action="{% url 'services:list' %}">
+                    <input type="text" name="search" placeholder="Search services..." value="{{ search_query }}">
+                </form>
+            </div>
+            
+            <!-- Categories -->
+            <div class="filter-section">
+                <h3>Categories</h3>
+                <ul>
+                    <li>
+                        <a href="{% url 'services:list' %}" class="{% if not selected_category %}active{% endif %}">
+                            <span>All Services</span>
+                            <span>{{ services.paginator.count }}</span>
+                        </a>
+                    </li>
+                    {% for category in categories %}
+                    <li>
+                        <a href="{% url 'services:list_by_category' category.slug %}" 
+                           class="{% if selected_category.id == category.id %}active{% endif %}">
+                            <span>{{ category.name }}</span>
+                            <span>{{ category.services.count }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <!-- Sort Options -->
+            <div class="filter-section">
+                <h3>Sort By</h3>
+                <form method="get" id="sortForm">
+                    <select name="sort" onchange="this.form.submit()" class="form-control">
+                        <option value="featured" {% if sort_by == 'featured' %}selected{% endif %}>Featured</option>
+                        <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Popular</option>
+                    </select>
+                    {% if search_query %}
+                    <input type="hidden" name="search" value="{{ search_query }}">
+                    {% endif %}
+                </form>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="services-main">
+            <div class="services-toolbar">
+                <div class="results-count">
+                    Showing {{ services.start_index }}–{{ services.end_index }} of {{ services.paginator.count }} services
+                </div>
+            </div>
+            
+            {% if services %}
+            <div class="services-grid">
+                {% for service in services %}
+                <article class="service-card">
+                    <div class="service-image {% cycle 'gradient-1' 'gradient-2' 'gradient-3' 'gradient-4' %}">
+                        
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% if service.id in wishlist_service_ids %}{% url 'services:remove_from_wishlist' service.id %}{% else %}{% url 'services:add_to_wishlist' service.id %}{% endif %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="wishlist-btn {% if service.id in wishlist_service_ids %}active{% endif %}">
+                                {% if service.id in wishlist_service_ids %}❤️{% else %}🤍{% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        {% if service.is_featured %}
+                        <span class="service-badge">Featured</span>
+                        {% endif %}
+                        
+                        <span style="font-size: 4rem;">
+                            {% if 'nursing' in service.category.name|lower %}🩺
+                            {% elif 'physio' in service.category.name|lower %}🧘
+                            {% elif 'elderly' in service.category.name|lower %}👴
+                            {% elif 'chronic' in service.category.name|lower %}💊
+                            {% else %}🏥{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="service-content">
+                        <div class="service-category">{{ service.category.name }}</div>
+                        <h3>{{ service.name }}</h3>
+                        <p>{{ service.short_description|truncatewords:20 }}</p>
+                        
+                        <div class="service-meta">
+                            <div class="service-price">
+                                <span class="price-amount">रू {{ service.base_price }}</span>
+                                <span class="price-unit">per {{ service.get_duration_unit_display }}</span>
+                            </div>
+                            <a href="{% url 'services:detail' service.slug %}" class="btn btn-primary">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if services.has_other_pages %}
+            <ul class="pagination">
+                {% if services.has_previous %}
+                <li><a href="?page={{ services.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">← Previous</a></li>
+                {% endif %}
+                
+                {% for num in services.paginator.page_range %}
+                    {% if services.number == num %}
+                    <li><span class="current">{{ num }}</span></li>
+                    {% elif num > services.number|add:'-3' and num < services.number|add:'3' %}
+                    <li><a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if services.has_next %}
+                <li><a href="?page={{ services.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Next →</a></li>
+                {% endif %}
+            </ul>
+            {% endif %}
+            
+            {% else %}
+            <div class="no-services">
+                <h3>No services found</h3>
+                <p>Try adjusting your search or filters</p>
+                <a href="{% url 'services:list' %}" class="btn btn-primary">Clear Filters</a>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% endblock %}

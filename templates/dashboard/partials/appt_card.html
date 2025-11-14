@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* * == UH CARE PROFESSIONAL APPOINTMENT CARD STYLES ==
+     * 1. Defines the UH Care color palette and utility colors.
+     * 2. Styles the Date Badge for high visibility.
+     * 3. Creates branded Status Badges based on the appointment status.
+     * 4. Ensures clean, readable card appearance.
+     */
+    
+    :root {
+        /* UH Care Brand Palette */
+        --uh-blue: #004a99; /* Primary Brand Blue */
+        --uh-blue-700: var(--uh-blue);
+        --uh-blue-600: #003a7a;
+        --uh-blue-100: #e0f2ff; /* Very Light Blue for background */
+        
+        --uh-green: #009e4d; /* Success/Confirmed */
+        --uh-yellow: #ffc107; /* Pending/Warning */
+        --uh-red: #E60000; /* Cancelled/Danger */
+        
+        --text-primary: #1C1C1E;
+        --text-secondary: #636366;
+        --border: #E5E5EA;
+        --radius-lg: 12px;
+        --radius-md: 8px;
+    }
+
+    /* Card Styling */
+    .shadow-xl {
+        /* Enhances the shadow for a professional lift effect */
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border);
+    }
+    
+    /* Date Badge Styling */
+    .bg-uh-blue-100 { background-color: var(--uh-blue-100); }
+    .text-uh-blue-700 { color: var(--uh-blue); }
+    .text-uh-blue-600 { color: var(--uh-blue-600); }
+    
+    .flex-shrink-0 { /* Ensures the date badge is vertically centered and compact */
+        align-self: flex-start;
+        height: 100%;
+    }
+
+    /* Status Badge Styling (Critical branding component) */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px; /* Full rounded corners */
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    /* CONFIRMED or APPROVED (Success/Green) */
+    .status-confirmed, .status-approved {
+        background-color: rgba(0, 158, 77, 0.15); /* Light Green */
+        color: var(--uh-green);
+    }
+
+    /* PENDING or REQUESTED (Warning/Yellow) */
+    .status-pending, .status-requested {
+        background-color: rgba(255, 193, 7, 0.15); /* Light Yellow */
+        color: #b38500; /* Darker Yellow text for contrast */
+    }
+
+    /* CANCELLED or REJECTED (Danger/Red) */
+    .status-cancelled, .status-rejected {
+        background-color: rgba(230, 0, 0, 0.15); /* Light Red */
+        color: var(--uh-red);
+    }
+    
+    /* COMPLETED (Neutral/Blue or Gray-Green) */
+    .status-completed {
+        background-color: #d8e5f8; /* Very Light Blue */
+        color: var(--uh-blue);
+    }
+
+    /* Action Button (View) */
+    .w-full.sm\:w-auto.text-center.font-semibold {
+        transition: all 0.2s ease;
+    }
+    
+</style>
+{% endblock %}
+
+{% block content_with_appt %}
+<article class="bg-white rounded-lg shadow-xl flex flex-col sm:flex-row items-center gap-6 p-6">
+    <div class="flex-shrink-0 text-center bg-uh-blue-100 rounded-lg p-4 w-full sm:w-20">
+        <div class="text-3xl font-bold text-uh-blue-700">{{ appt.appointment_date|date:"d" }}</div>
+        <div class="text-sm font-medium text-uh-blue-600 uppercase">{{ appt.appointment_date|date:"M" }}</div>
+    </div>
+    
+    <div class="flex-grow">
+        <h3 class="font-semibold text-gray-900 text-lg">Personal: {{ appt.get_appointment_type_display }}</h3>
+        <div class="flex flex-wrap gap-x-6 gap-y-2 text-gray-600 mt-2">
+            <span class="flex items-center gap-2 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                {{ appt.appointment_time|time:"g:i A" }}
+            </span>
+            <span class="flex items-center gap-2 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                {{ appt.provider.get_full_name }}
+            </span>
+        </div>
+    </div>
+
+    <div class="flex-shrink-0 flex flex-col items-stretch sm:items-end gap-3 w-full sm:w-auto">
+        <span class="status-badge status-{{ appt.status }}">{{ appt.get_status_display }}</span>
+        
+        <a href="{% url 'appointments:personal_appointment_detail' appt.id %}" class="w-full sm:w-auto text-center font-semibold text-gray-700 bg-white border border-gray-300 py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200">View</a>
+    </div>
+</article>
+{% endblock %}

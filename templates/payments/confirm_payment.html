@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Payment - UH Care{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div class="p-6 sm:p-8">
+            <h2 class="text-2xl font-bold text-uh-blue-700">Confirm Payment for #{{ payment.id }}</h2>
+            <p class="mt-4 text-lg text-gray-600">
+                Amount: 
+                <strong class="text-2xl font-bold text-uh-green-600 ml-2">रू {{ payment.amount }}</strong>
+            </p>
+
+            <form method="post" class="mt-6">
+                {% csrf_token %}
+                <div>
+                    <label for="id_payment_method" class="block text-sm font-medium text-gray-700 mb-2">
+                        Select payment method
+                    </label>
+                    <select name="payment_method" id="id_payment_method" 
+                            class="form-select w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-uh-blue-600 focus:border-transparent transition-colors duration-200">
+                        <option value="cash">Cash After Service</option>
+                        <option value="online">Online (QR)</option>
+                    </select>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center gap-4">
+                    <button class="w-full sm:w-auto bg-uh-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200" 
+                            type="submit">
+                        Confirm Payment
+                    </button>
+                    <a class="w-full sm:w-auto text-center font-semibold text-gray-700 bg-white border border-gray-300 py-2.5 px-6 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200" 
+                       href="{% if payment.appointment %}{% url 'appointments:detail' payment.appointment.id %}{% else %}{% url 'dashboard:home' %}{% endif %}">
+                        Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

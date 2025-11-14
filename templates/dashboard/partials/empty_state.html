@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* * == UH CARE PROFESSIONAL INFO CARD STYLES ==
+     * 1. Defines the UH Care color palette.
+     * 2. Enhances the card shadow and overall professional look.
+     * 3. Ensures the branded button and text colors are correct.
+     */
+    
+    :root {
+        /* UH Care Brand Palette & UI Variables */
+        --uh-blue: #004a99; /* Primary Brand Blue */
+        --uh-blue-700: var(--uh-blue);
+        --uh-blue-600: #003a7a;
+        --uh-blue-100: #e0f2ff; /* Very Light Blue for icon background */
+        
+        --text-primary: #1C1C1E;
+        --text-secondary: #636366;
+        --border: #E5E5EA;
+        --radius-lg: 12px;
+        --radius-md: 8px;
+    }
+
+    /* Card Shadow Enhancement */
+    .shadow-xl {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border);
+    }
+    
+    /* Icon Container Styling */
+    .w-16.h-16.text-gray-400.mx-auto.mb-4 {
+        /* This container is where the icon lives. Let's brand it. */
+        width: 4rem; /* 64px */
+        height: 4rem; /* 64px */
+        color: var(--uh-blue-600); /* Icon color */
+        background-color: var(--uh-blue-100); /* Light blue background */
+        border-radius: 50%; /* Circle shape */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 1rem;
+    }
+    
+    /* Icon inside the container (if it's an SVG) */
+    .w-16.h-16.text-gray-400.mx-auto.mb-4 > svg {
+        width: 1.5rem; /* Make the icon size appropriate for the circle */
+        height: 1.5rem;
+    }
+
+    /* Text Styling */
+    .text-gray-800 { color: var(--text-primary); }
+    .text-gray-600 { color: var(--text-secondary); }
+
+    /* Button Styling (Ensuring utility classes map to defined brand colors) */
+    .bg-uh-blue-700 { background-color: var(--uh-blue); }
+    .hover\:bg-uh-blue-600:hover { background-color: var(--uh-blue-600); }
+    .focus\:ring-uh-blue-700:focus { box-shadow: 0 0 0 2px var(--uh-blue); }
+
+    .rounded-lg { border-radius: var(--radius-md); }
+    
+    a.bg-uh-blue-700 {
+        text-decoration: none; /* Ensure no underline on the button */
+        display: inline-block;
+        transition: all 0.2s;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="text-center p-12 bg-white rounded-lg shadow-xl">
+    <div class="w-16 h-16 text-gray-400 mx-auto mb-4">
+        {{ icon|safe }}
+    </div>
+    
+    <h3 class="text-2xl font-semibold text-gray-800 mb-2">{{ title }}</h3>
+    
+    <p class="text-gray-600 mb-6">{{ text }}</p>
+    
+    <a href="{{ cta_url }}" class="bg-uh-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">
+        {{ cta_text }}
+    </a>
+</div>
+{% endblock %}

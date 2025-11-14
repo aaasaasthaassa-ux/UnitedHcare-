@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.11]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations (dry) and collectstatic (no input)
+        env:
+          DJANGO_SECRET_KEY: test-secret
+          DJANGO_DEBUG: True
+        run: |
+          python manage.py migrate --noinput || true
+          python manage.py collectstatic --noinput || true
+
+      - name: Run tests
+        env:
+          DJANGO_SECRET_KEY: test-secret
+          DJANGO_DEBUG: True
+        run: |
+          if [ -f pytest.ini ] || pytest --version 2>/dev/null; then
+            pytest -q
+          else
+            echo "No pytest config or tests found; skipping pytest"
+          fi

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Buy {{ equipment.name }} - UH Care{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/compat.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+  <h1 class="text-3xl font-bold text-uh-blue-700 mb-8">Purchase Equipment</h1>
+    
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Main Content: Form -->
+    <div class="lg:col-span-2 bg-white rounded-lg shadow-xl p-6 sm:p-8">
+      <!-- Equipment Header -->
+      <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 mb-6 border-b border-gray-200">
+        <div class="flex-shrink-0 w-24 h-24 bg-uh-blue-100 rounded-lg flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-uh-blue-700">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 01-2.25 2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 013 12V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25V12zM12 12.75V18m0 0l-3-3m3 3l3-3m-3-6h.008v.008H12V6.75z" />
+            </svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">{{ equipment.name }}</h2>
+          <p class="text-base text-gray-600">{{ equipment.brand }}</p>
+          <p class="text-3xl font-extrabold text-uh-green-600 mt-2">रू {{ equipment.purchase_price }}</p>
+        </div>
+      </div>
+            
+      <form method="post">
+        {% csrf_token %}
+                
+        <div class="mb-6">
+          <label class="form-label required">Quantity</label>
+          {{ form.quantity }}
+          {% if form.quantity.errors %}
+              <div class="text-sm text-red-600 mt-1">
+                  {% for error in form.quantity.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% endif %}
+        </div>
+                
+        <div class="space-y-6">
+          <h3 class="text-xl font-semibold text-gray-900 border-t border-gray-200 pt-6">Delivery Information</h3>
+          {% for field in form %}
+            {% if field.name != 'quantity' %}
+            <div>
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                  <div class="text-sm text-red-600 mt-1">
+                      {% for error in field.errors %}
+                          <span>{{ error }}</span>
+                      {% endfor %}
+                  </div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+                
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <button type="submit" class="w-full bg-uh-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-green-500 focus:outline-none focus:ring-2 focus:ring-uh-green-600 focus:ring-offset-2 transition-all duration-200 text-lg">
+                Place Order
+            </button>
+        </div>
+      </form>
+    </div>
+        
+    <!-- Aside: Order Summary -->
+    <aside class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow-xl p-6 sticky top-8">
+        <h3 class="text-xl font-semibold text-gray-900 mb-6 pb-4 border-b border-gray-200">Order Summary</h3>
+        
+        <div class="space-y-3 text-gray-600">
+            <div class="flex justify-between">
+              <span>Unit Price:</span>
+              <span class="font-medium text-gray-900">रू {{ equipment.purchase_price }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Delivery:</span>
+              <span class="font-medium text-gray-900">रू 200</span>
+            </div>
+        </div>
+                
+        <div class="mt-6 pt-6 border-t-2 border-gray-200">
+          <div class="flex justify-between items-center text-2xl font-bold">
+            <span>Total:</span>
+            <span class="text-uh-green-600">रू {{ equipment.purchase_price|add:200 }}</span>
+          </div>
+        </div>
+                
+        <div class="mt-8 p-4 bg-uh-green-100 rounded-lg">
+          <h4 class="font-semibold text-uh-green-600 mb-2">✓ Includes:</h4>
+          <ul class="list-disc list-inside space-y-1 text-sm text-gray-700">
+            <li>12 months warranty</li>
+            <li>Free delivery</li>
+            <li>Installation support</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+{% endblock %}

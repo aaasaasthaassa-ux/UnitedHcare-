@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pharmacy - UH Care{% endblock %}
+
+{% block content %}
+    {% include 'partials/video_hero.html' with title="Online Pharmacy" subtitle="Order medicines and healthcare products online" %}
+
+    <div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+
+            <!-- Filters Sidebar -->
+            <aside class="lg:sticky top-24 h-fit bg-white rounded-lg shadow-xl p-6 django-form">
+                <div class="mb-6">
+                    <form method="get">
+                        <label for="id_search" class="block mb-2 text-sm font-medium text-gray-700">Search</label>
+                        <input type="text" name="search" id="id_search" placeholder="Search medicines..." value="{{ search_query }}" class="form-input">
+                    </form>
+                </div>
+
+                <div class="filter-section">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Categories</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="{% url 'pharmacy:list' %}" 
+                                 class="block py-1 px-2 rounded-md {% if not selected_category %}font-bold text-uh-blue-700 bg-uh-blue-100{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                                 All Medicines
+                            </a>
+                        </li>
+                        {% for category in categories %}
+                        <li>
+                            <a href="{% url 'pharmacy:list_by_category' category.slug %}" 
+                                 class="block py-1 px-2 rounded-md {% if selected_category.id == category.id %}font-bold text-uh-blue-700 bg-uh-blue-100{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                                 {{ category.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Toolbar: Results Count & Sort -->
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white rounded-lg shadow-md p-4">
+                    <div class="text-sm text-gray-600 mb-2 sm:mb-0">
+                        Showing {{ medicines.start_index }}–{{ medicines.end_index }} of {{ medicines.paginator.count }} medicines
+                    </div>
+                    <form method="get" class="django-form flex items-center gap-2">
+                        <label for="id_sort" class="text-sm font-medium text-gray-700">Sort by:</label>
+                        <select name="sort" id="id_sort" onchange="this.form.submit()" class="form-select py-2 pl-3 pr-8 rounded-lg">
+                            <option value="featured" {% if sort_by == 'featured' %}selected{% endif %}>Featured</option>
+                            <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Popular</option>
+                        </select>
+                    </form>
+                </div>
+
+                {% if medicines %}
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {% for medicine in medicines %}
+                    <article class="bg-white rounded-lg shadow-xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl">
+                        {% if medicine.image_url %}
+                        <div class="h-48 w-full">
+                            <img src="{{ medicine.image_url }}" alt="{{ medicine.name }}" class="w-full h-full object-cover" />
+                        </div>
+                        {% else %}
+                        <div class="h-48 w-full bg-gray-100 text-gray-400 flex items-center justify-center">
+                            <!-- Icon: Pill Bottle -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a2.25 2.25 0 01-2.25 2.25H5.25a2.25 2.25 0 01-2.25-2.25v-8.25M12 4.875A2.625 2.625 0 1012 10.125 2.625 2.625 0 0012 4.875zM12 15v.001M18 5.25v.001M6 5.25v.001" />
+                            </svg>
+                        </div>
+                        {% endif %}
+
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h3 class="text-lg font-semibold text-gray-900">{{ medicine.name }}</h3>
+                            <p class="text-sm text-gray-500 mb-3">{{ medicine.generic_name|default:"Generic" }}</p>
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                {% if medicine.prescription_required == 'required' %}
+                                <span class="text-xs font-medium px-3 py-1 rounded-full bg-uh-red-100 text-uh-red-600">Rx Required</span>
+                                {% else %}
+                                <span class="text-xs font-medium px-3 py-1 rounded-full bg-uh-green-100 text-uh-green-600">OTC</span>
+                                {% endif %}
+                                {% if medicine.in_stock %}
+                                <span class="text-xs font-medium px-3 py-1 rounded-full bg-uh-blue-100 text-uh-blue-700">In Stock</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-sm text-gray-600 flex-grow">{{ medicine.strength }} • {{ medicine.package_size }} {{ medicine.get_unit_type_display }}</p>
+                            <div class="flex justify-between items-center mt-5 pt-4 border-t border-gray-100">
+                                <span class="text-2xl font-bold text-uh-green-600">रू {{ medicine.price }}</span>
+                                <a href="{% url 'pharmacy:detail' medicine.slug %}" class="bg-uh-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-sm">View</a>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center p-12 bg-white rounded-lg shadow-xl col-span-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-2">No medicines found</h3>
+                    <p class="text-gray-600">Try adjusting your search or filters to find what you're looking for.</p>
+                </div>
+                {% endif %}
+            </main>
+        </div>
+    </div>
+
+{% endblock %}

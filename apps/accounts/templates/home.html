@@ -1,0 +1,687 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}UH Care - Professional Home Healthcare Services in Nepal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    /* * == UH CARE PROFESSIONAL STYLESHEET ==
+     * 1. Colors updated to match the UH Care logo (Blue, Green, Red).
+     * 2. Typography modernized for a cleaner, professional feel.
+     * 3. Gradient placeholders replaced with neutral, image-ready backgrounds.
+     */
+
+    :root {
+        /* UH Care Brand Palette (from logo) */
+        --uh-blue: #004a99;    /* Professional blue from the 'H' */
+        --uh-green: #009e4d;   /* Vibrant green from the 'U' */
+        --uh-red: #E60000;      /* Bright red accent from the EKG line */
+        --uh-blue-dark: #002d6b; /* A darker blue for gradients */
+
+        /* Theme Variable Mapping */
+        --primary: var(--uh-blue);
+        --secondary: var(--uh-green);
+        --accent: var(--uh-red);
+
+        /* UI Colors */
+        --bg-primary: #FFFFFF;
+        --bg-secondary: #F8F9FA; /* Light Gray for sections */
+        --text-primary: #1C1C1E; /* Dark for high contrast */
+        --text-secondary: #636366; /* Subdued gray for body text */
+        --border: #E5E5EA;
+        --shadow: rgba(0, 0, 0, 0.05);
+        --shadow-lg: rgba(0, 0, 0, 0.1);
+        --radius-lg: 12px;
+        --radius-md: 8px;
+    }
+
+    /* General Body Typography Enhancement */
+    body {
+        /* Using a modern system font stack for performance and a clean look */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Hero Section */
+    .hero {
+        /* Updated gradient to use brand-aligned blues */
+        background: linear-gradient(135deg, var(--primary) 0%, var(--uh-blue-dark) 100%);
+        padding: 7rem 0;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><path d="M 0 0 L 100 100 M 100 0 L 0 100" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>') repeat;
+        opacity: 0.2;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* Hero video background wrapper */
+    .hero-video-wrapper {
+        position: absolute;
+        inset: 0; /* top:0; right:0; bottom:0; left:0 */
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .hero-video-wrapper video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: saturate(0.95) contrast(0.95) brightness(0.55);
+    }
+
+    /* Subtle overlay to improve text contrast */
+    .hero-video-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0,36,102,0.35) 0%, rgba(0,36,102,0.55) 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+    
+    .hero h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .hero p {
+        font-size: 1.35rem;
+        margin-bottom: 2.5rem;
+        opacity: 0.9;
+    }
+    
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .hero .btn {
+        padding: 1.1rem 2.5rem;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-white {
+        background: white;
+        color: var(--primary);
+    }
+    
+    .btn-white:hover {
+        background: var(--bg-secondary);
+        color: var(--primary);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-primary {
+        /* Using the brand's secondary green color */
+        background: var(--secondary); 
+        color: white;
+        border: 2px solid var(--secondary);
+    }
+
+    .btn-primary:hover {
+        background: #008a42; /* Darker green on hover */
+        border-color: #008a42;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Features Section */
+    .features {
+        padding: 6rem 0;
+        background: var(--bg-primary);
+    }
+    
+    .section-header {
+        text-align: center;
+        margin-bottom: 5rem;
+    }
+    
+    .section-header h2 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        position: relative;
+    }
+
+    .section-header h2::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 4px;
+        background: var(--primary); /* Uses brand blue */
+        margin: 10px auto 0;
+        border-radius: 2px;
+    }
+    
+    .section-header p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 3rem;
+        margin-top: 3rem;
+    }
+    
+    .feature-card {
+        background: var(--bg-primary);
+        border: none;
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 4px 15px var(--shadow);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px var(--shadow-lg);
+        border-color: transparent;
+    }
+    
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1.5rem;
+        /* Updated gradient to use brand Blue and Green */
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.2rem;
+        font-weight: 700;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+    }
+    
+    .feature-card p {
+        color: var(--text-secondary);
+        line-height: 1.7;
+    }
+    
+    /* Services Preview */
+    .services-preview {
+        padding: 6rem 0;
+        background: var(--bg-secondary);
+    }
+    
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+    
+    .service-card {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: 0 2px 10px var(--shadow);
+        transition: all 0.3s;
+    }
+    
+    .service-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 45px var(--shadow-lg);
+    }
+    
+    .service-image {
+        width: 100%;
+        height: 220px;
+        /* Replaced gradient with a neutral background for real images */
+        background: var(--bg-secondary); 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary); /* Color for fallback icon */
+        font-size: 3.5rem;
+        overflow: hidden;
+    }
+
+    /* Style for the actual image inside the service-image container */
+    .service-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures image covers the container */
+    }
+    
+    .service-content {
+        padding: 2rem;
+    }
+    
+    .service-content h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+    }
+    
+    .service-content p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        line-height: 1.7;
+    }
+    
+    .service-price {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+    
+    .price {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--primary); /* Uses brand blue */
+    }
+
+    .service-price .btn-primary {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    /* CTA Section */
+    .cta {
+        /* Updated gradient to use a deep, professional brand blue */
+        background: linear-gradient(135deg, var(--uh-blue-dark) 0%, var(--primary) 100%);
+        padding: 6rem 0;
+        text-align: center;
+        color: white;
+    }
+    
+    .cta h2 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .cta p {
+        font-size: 1.35rem;
+        margin-bottom: 3rem;
+        opacity: 0.95;
+    }
+
+    .btn-secondary {
+        background: none;
+        color: white;
+        border: 2px solid white;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Stats Section */
+    .stats {
+        padding: 5rem 0;
+        background: var(--bg-primary);
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 3rem;
+        text-align: center;
+    }
+    
+    .stat-item h3 {
+        font-size: 4rem;
+        font-weight: 900;
+        color: var(--primary); /* Uses brand blue */
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-item p {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* New class for equipment/pharmacy image placeholders */
+    .card-image-placeholder {
+        height: 140px;
+        background: var(--bg-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    @media (max-width: 768px) {
+        .hero h1 {
+            font-size: 3rem;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+        }
+        
+        .features-grid,
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+        .hero-buttons {
+            flex-direction: column;
+        }
+        .hero .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero" aria-label="UH Care hero">
+    <div class="hero-video-wrapper" aria-hidden="true">
+        <video class="hero-video" autoplay muted loop playsinline poster="{% static 'images/hero-poster.jpg' %}">
+            <source src="{% static 'videos/hero.mp4' %}" type="video/mp4">
+            <!-- Fallback image/video not supported -->
+        </video>
+        <div class="hero-video-overlay" aria-hidden="true"></div>
+    </div>
+    <div class="hero-content">
+        <h1>Exceptional Home Healthcare, <br>Delivered with Professionalism</h1>
+        <p>Experience <strong>licensed medical care, skilled nursing, and compassionate health services</strong> in the privacy and comfort of your home across Nepal.</p>
+        <div class="hero-buttons">
+            <a href="{% url 'accounts:register_patient' %}" class="btn btn-white">Book Your Care</a>
+            <a href="{% url 'services:list' %}" class="btn btn-primary">Explore Services</a>
+        </div>
+    </div>
+</section>
+
+<section class="stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>500+</h3>
+                <p>Patients Served</p>
+            </div>
+            <div class="stat-item">
+                <h3>50+</h3>
+                <p>Verified Providers</p>
+            </div>
+            <div class="stat-item">
+                <h3>12+</h3>
+                <p>Specialized Services</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>Dedicated Support</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <div class="section-header">
+            <h2>The UH Care Advantage</h2>
+            <p>We combine professional medical standards with unmatched convenience and trust to redefine home healthcare.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-user-md"></i></div> 
+                <h3>**Licensed Professionals**</h3>
+                <p>Our providers are fully licensed and undergo rigorous training to deliver the highest standard of care at your location.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                <h3>**24/7 Availability**</h3>
+                <p>Quick booking and reliable service with round-the-clock support to meet your most urgent healthcare needs.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-tags"></i></div>
+                <h3>**Transparent Pricing**</h3>
+                <p>Clear, upfront pricing in NPR with secure, flexible payment options including major digital platforms.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-desktop"></i></div>
+                <h3>**Intuitive Platform**</h3>
+                <p>Manage appointments, view service details, and communicate with providers easily through our modern dashboard.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>**Safety & Vetting**</h3>
+                <p>Every professional is verified, background-checked, and adheres to strict safety protocols for your peace of mind.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                <h3>**Integrated Records**</h3>
+                <p>Securely monitor treatment history, payment records, and health progress all within your personalized account.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="services-preview">
+    <div class="container">
+        <div class="section-header">
+            <h2>Specialized Care Services</h2>
+            <p>Offering a diverse range of comprehensive, in-home medical and support services tailored to individual requirements.</p>
+        </div>
+        
+        <div class="services-grid">
+            {% if services %}
+                {% for service in services %}
+                    <div class="service-card">
+                        <div class="service-image">
+                            {% if service.image_url %}
+                                <img src="{{ service.image_url }}" alt="{{ service.name }}" />
+                            {% elif service.image %}
+                                <img src="{{ service.image.url }}" alt="{{ service.name }}" />
+                            {% else %}
+                                <i class="fas fa-briefcase-medical"></i>
+                            {% endif %}
+                        </div>
+                        <div class="service-content">
+                            <h3>{{ service.name }}</h3>
+                            <p class="helptext">{{ service.short_description|default:service.description|truncatechars:140 }}</p>
+                            <div class="service-price">
+                                <span class="price">रू {{ service.base_price }}</span>
+                                <div style="display:flex; gap:0.5rem; align-items:center;">
+                                    <a href="{% url 'services:detail' service.slug %}" class="btn btn-primary">Details</a>
+                                    <a href="{% url 'services:list' %}" class="btn btn-white">All Services</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="service-card">
+                    <div class="service-content">
+                        <h3>No services available</h3>
+                        <p class="helptext">We currently don't have active services published. Contact support for more information.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 5rem;">
+            <a href="{% url 'services:list' %}" class="btn btn-primary" style="padding: 1.2rem 3rem;">View All Specialized Services</a>
+        </div>
+    </div>
+</section>
+
+<section class="features" style="padding-top:4rem; padding-bottom:4rem;">
+    <div class="container">
+        <div class="section-header">
+            <h2>Equipment — Buy or Rent</h2>
+            <p>Trusted medical equipment available for purchase or short-term rental with transparent pricing.</p>
+        </div>
+
+        <div class="features-grid">
+            {% if equipments %}
+                {% for eq in equipments|slice:":3" %}
+                    <div class="feature-card">
+                        <div class="card-image-placeholder">
+                            {{ eq.name|default:'Equipment' }}
+                        </div>
+                        <div style="padding:1.25rem; text-align:left;">
+                            <h3 style="margin-bottom:0.25rem;">{{ eq.name }}</h3>
+                            <p style="color:var(--text-secondary);">{{ eq.short_description|default:eq.description|default:'No description provided.' }}</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
+                                <strong class="price">रू {{ eq.price|default:'0' }}</strong>
+                                <div style="display:flex; gap:0.5rem;">
+                                    {% comment %} Use availability property to determine rent/buy actions {% endcomment %}
+                                    {% if eq.availability == 'rent' or eq.availability == 'both' %}
+                                        <a href="{% url 'equipment:detail' eq.slug %}?mode=rent" class="btn btn-primary">Rent</a>
+                                    {% endif %}
+                                    {% if eq.availability == 'buy' or eq.availability == 'both' %}
+                                        <a href="{% url 'equipment:detail' eq.slug %}?mode=buy" class="btn btn-white">Buy</a>
+                                    {% endif %}
+                                    <a href="{% url 'equipment:detail' eq.slug %}" class="btn btn-white">Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="feature-card">
+                    <h3>No equipment available yet</h3>
+                    <p class="helptext">We don't have any equipment listed right now. Check back later or contact our support to add inventory.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="text-align:center; margin-top:3rem;">
+            <a href="/equipment/" class="btn btn-primary" style="padding:1rem 2rem;">Browse all equipment</a>
+        </div>
+    </div>
+</section>
+
+<section class="services-preview" style="padding-top:3rem; padding-bottom:3rem;">
+    <div class="container">
+        <div class="section-header">
+            <h2>Pharmacy — Featured Products</h2>
+            <p>Browse popular medicines and supplies. You can view product details without signing in. Ordering requires a patient account.</p>
+        </div>
+
+        <div class="services-grid">
+            {% if pharmacy_products %}
+                {% for med in pharmacy_products|slice:":6" %}
+                    <div class="service-card">
+                        <div class="service-image" style="height:120px;">
+                            {% if med.image_url %}
+                                <img src="{{ med.image_url }}" alt="{{ med.name }}" style="object-fit:contain;" />
+                            {% elif med.image %}
+                                <img src="{{ med.image.url }}" alt="{{ med.name }}" style="object-fit:contain;" />
+                            {% else %}
+                                {{ med.name }}
+                            {% endif %}
+                        </div>
+
+                        <div class="service-content">
+                            <h3>{{ med.name }} {% if med.strength %}<small style="font-weight:600; color:var(--text-secondary);">— {{ med.strength }}</small>{% endif %}</h3>
+                            <p class="helptext" style="color:var(--text-secondary);">{{ med.short_description|default:med.uses|default:med.description|truncatechars:120 }}</p>
+                            <p style="margin-top:0.5rem; color:var(--text-secondary);">Price: <strong class="price">रू {{ med.price }}</strong></p>
+
+                            <div style="margin-top:1rem; display:flex; gap:0.5rem; align-items:center;">
+                                <a href="{% url 'pharmacy:detail' med.slug %}" class="btn btn-primary">View</a>
+
+                                {% if user.is_authenticated and user.role != 'provider' %}
+                                    <form method="post" action="{% url 'pharmacy:add_to_cart' med.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-white">Add to Cart</button>
+                                    </form>
+                                {% else %}
+                                    <a href="{% url 'accounts:login' %}?next={% url 'pharmacy:detail' med.slug %}" class="btn btn-white">Login to Order</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="service-card">
+                    <div class="service-content">
+                        <h3>No products available</h3>
+                        <p class="helptext">Our pharmacy currently has no active products. Check back later or contact support.</p>
+                        <div style="margin-top:1rem;">
+                            <a href="/pharmacy/" class="btn btn-primary">Browse Pharmacy</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="container">
+        <h2>Ready to Secure Quality Care?</h2>
+        <p>Join hundreds of satisfied patients who trust us for reliable, professional, and compassionate home healthcare services.</p>
+        <div class="hero-buttons">
+            <a href="{% url 'accounts:register_patient' %}" class="btn btn-white">Create Patient Account</a>
+            <a href="{% url 'accounts:register_provider' %}" class="btn btn-secondary">Partner with Us (Provider)</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

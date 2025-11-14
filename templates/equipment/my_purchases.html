@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}My Purchases - UH Care{% endblock %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
+    <h1 class="text-3xl font-bold text-uh-blue-700">My Purchases</h1>
+    <a href="{% url 'equipment:list' %}" class="btn btn-outline flex-shrink-0">Browse equipment</a>
+  </div>
+
+  {% if purchases %}
+  <div class="space-y-6">
+    {% for purchase in purchases %}
+    <!-- Purchase Card -->
+    <article class="bg-white rounded-lg shadow-xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
+      <!-- Image -->
+      <div class="flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+        {% if purchase.equipment.image %}
+          <img src="{{ purchase.equipment.image.url }}" alt="{{ purchase.equipment.name }}" class="w-full h-full object-cover" />
+        {% elif purchase.equipment.image_url %}
+          <img src="{{ purchase.equipment.image_url }}" alt="{{ purchase.equipment.name }}" class="w-full h-full object-cover" />
+        {% else %}
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 01-2.25 2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 013 12V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25V12zM12 12.75V18m0 0l-3-3m3 3l3-3m-3-6h.008v.008H12V6.75z" />
+          </svg>
+        {% endif %}
+      </div>
+
+      <!-- Details -->
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
+          <div class="min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 truncate">{{ purchase.equipment.name }}</h3>
+            <div class="text-sm text-gray-600 mt-1">Order <strong>#{{ purchase.order_number }}</strong> • {{ purchase.created_at|date:"F d, Y" }}</div>
+          </div>
+
+          <div class="text-left sm:text-right flex-shrink-0">
+            {% if purchase.status == 'completed' or purchase.status == 'delivered' %}
+              <span class="py-1 px-3 rounded-full text-xs font-semibold bg-uh-green-100 text-uh-green-600">{{ purchase.get_status_display }}</span>
+            {% elif purchase.status == 'pending' %}
+              <span class="py-1 px-3 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">{{ purchase.get_status_display }}</span>
+            {% elif purchase.status == 'cancelled' %}
+              <span class="py-1 px-3 rounded-full text-xs font-semibold bg-uh-red-100 text-uh-red-600">{{ purchase.get_status_display }}</span>
+            {% else %}
+              <span class="py-1 px-3 rounded-full text-xs font-semibold bg-uh-blue-100 text-uh-blue-700">{{ purchase.get_status_display }}</span>
+            {% endif %}
+            <div class="text-lg font-bold text-uh-green-600 mt-2">रु {{ purchase.total_amount|intcomma }}</div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-gray-200 flex flex-wrap items-center gap-3">
+          <a href="{% url 'equipment:purchase_detail' purchase.order_number %}" class="btn btn-secondary">View details</a>
+
+          {% if purchase.unpaid_payment %}
+            <a href="{% url 'payments:detail' purchase.unpaid_payment.id %}" class="btn btn-danger">Pay now</a>
+            <span class="text-sm text-uh-red-600 font-medium">Unpaid • {{ purchase.unpaid_payment.created_at|date:"M d, Y" }}</span>
+          {% else %}
+            <span class="text-sm text-gray-600">{{ purchase.quantity }} × રૂ {{ purchase.unit_price }}</span>
+          {% endif %}
+
+          {% if purchase.status == 'pending' %}
+            <button type="button" class="btn btn-danger open-cancel-modal" data-action-url="{% url 'equipment:cancel_purchase' purchase.order_number %}" data-purchase-id="{{ purchase.order_number }}">Cancel order</button>
+          {% endif %}
+        </div>
+
+        {% if purchase.warranty_expires_at %}
+        <div class="mt-3 text-sm text-gray-600">Warranty until: <strong>{{ purchase.warranty_expires_at|date:"M d, Y" }}</strong></div>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center p-12 bg-white rounded-lg shadow-xl">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+    </svg>
+    <h3 class="text-2xl font-semibold text-gray-800 mb-2">No purchases yet</h3>
+    <p class="text-gray-600 max-w-md mx-auto mb-6">Your purchase history will appear here. Browse equipment to buy for home care.</p>
+    <a href="{% url 'equipment:list' %}" class="btn btn-primary">Browse equipment</a>
+  </div>
+  {% endif %}
+
+  <!-- Cancellation Modal (hidden by default) -->
+  <div id="cancel-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+    <div class="relative bg-white rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-lg transition-all transform scale-95 opacity-0" id="cancel-modal-panel">
+      <h3 class="text-xl font-semibold text-uh-blue-700" id="modal-title">Cancel Purchase</h3>
+      <p id="cancel-modal-desc" class="text-gray-600 mt-2">Are you sure you want to cancel this purchase? This action cannot be undone.</p>
+
+      <form id="cancel-form" method="post" action="">
+        {% csrf_token %}
+        <div class="flex flex-col-reverse sm:flex-row gap-3 justify-end mt-6">
+          <button type="button" class="btn btn-secondary w-full sm:w-auto" id="cancel-modal-close">Close</button>
+          <button type="submit" class="btn btn-danger w-full sm:w-auto">Confirm Cancellation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('cancel-modal');
+    if (!modal) return; // Exit if modal not on page
+
+    const modalPanel = document.getElementById('cancel-modal-panel');
+    const cancelForm = document.getElementById('cancel-form');
+    const modalDesc = document.getElementById('cancel-modal-desc');
+    const closeBtn = document.getElementById('cancel-modal-close');
+
+    function openModal(actionUrl, title) {
+        cancelForm.action = actionUrl;
+        modalDesc.textContent = 'You are about to cancel purchase #' + title + '. This action cannot be undone.';
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modalPanel.classList.remove('scale-95', 'opacity-0');
+            modalPanel.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeModal() {
+        modalPanel.classList.add('scale-95', 'opacity-0');
+        modalPanel.classList.remove('scale-100', 'opacity-100');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            cancelForm.action = '';
+        }, 200);
+    }
+
+    document.querySelectorAll('.open-cancel-modal').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+            const url = btn.getAttribute('data-action-url');
+            const title = btn.getAttribute('data-purchase-id') || 'this purchase';
+            openModal(url, title);
+        });
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function(e){
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+});
+</script>
+{% endblock %}

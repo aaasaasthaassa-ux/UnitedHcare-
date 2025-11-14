@@ -1,0 +1,175 @@
+{% block title %}Pay for {{ appointment.service.name }} - UH Care{% endblock %}
+
+{% block content %}
+<!-- 
+  This is a full HTML file for demonstration.
+  In your Django project, you will only need to copy the 
+  <style> block into your base.html <head> (if not already there)
+  and the contents of <div id="page-content">...</div> 
+  to replace your original HTML block.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use the title from your block -->
+    <title>Pay for {{ appointment.service.name }} - UH Care</title>
+    
+    <!-- 
+      Load Tailwind CSS and the 'forms' plugin
+      The 'forms' plugin professionally styles the radio buttons
+    -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        // Configuration for Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'uh-blue': {
+                            '700': '#004a9e', // Darker Blue from logo
+                            '600': '#0056b3',
+                            '100': '#e6f0ff',
+                        },
+                        'uh-green': {
+                            '600': '#4CAF50', // Green from logo
+                            '500': '#66BB6A',
+                            '100': '#eaf7ea',
+                        },
+                        'uh-red': {
+                            '600': '#D32F2F', // Red from logo heartbeat
+                            '500': '#E53E3E',
+                            '100': '#fbe9e9',
+                        }
+                    }
+                }
+            }
+            // The 'forms' plugin is loaded via the CDN URL, so no 'plugins' array is needed here.
+        }
+    </script>
+
+    <!-- 
+      Base styles (would be in your base.html)
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <!-- 
+                      ****************************************************
+                      * IMPORTANT: Replace 'YOUR_LOGO_URL_HERE.jpg'
+                      * with the public URL of your hosted logo.
+                      ****************************************************
+                    -->
+                    <img class="h-10 w-auto" 
+                         src="YOUR_LOGO_URL_HERE.jpg" 
+                         alt="UH Care Logo"
+                         onerror="this.src='https://placehold.co/150x40/004a9e/ffffff?text=UH+Care&font=inter'; this.onerror=null;">
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- This div wraps your actual page content -->
+    <div id="page-content">
+
+    <!-- This is your original &#123;% block content %&#125; -->
+        <div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+
+            <h1 class="text-3xl font-bold text-uh-blue-700 mb-8">Pay for: {{ appointment.service.name }}</h1>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Left Column: Payment Method -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+                        <div class="p-6 sm:p-8">
+                            <h3 class="text-xl font-semibold text-gray-800">Choose payment method</h3>
+                            
+                            <form method="post" class="mt-6">
+                                {% csrf_token %}
+                                <!-- The 'form-radio' class is styled by the @tailwindcss/forms plugin -->
+                                <div class="space-y-4">
+                                    <label class="flex items-center p-4 border border-gray-300 rounded-lg hover:border-uh-blue-600 cursor-pointer">
+                                        <input type="radio" name="payment_method" value="online" class="form-radio h-5 w-5 text-uh-blue-700 focus:ring-uh-blue-600" checked>
+                                        <span class="ml-3 text-sm font-medium text-gray-700">Online payment (QR / upload proof)</span>
+                                    </label>
+                                    <label class="flex items-center p-4 border border-gray-300 rounded-lg hover:border-uh-blue-600 cursor-pointer">
+                                        <input type="radio" name="payment_method" value="cash" class="form-radio h-5 w-5 text-uh-blue-700 focus:ring-uh-blue-600">
+                                        <span class="ml-3 text-sm font-medium text-gray-700">Cash after service</span>
+                                    </label>
+                                </div>
+
+                                <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center gap-4">
+                                    <button class="w-full sm:w-auto bg-uh-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200" 
+                                            type="submit">
+                                        Continue
+                                    </button>
+                                    <a class="w-full sm:w-auto text-center font-semibold text-gray-700 bg-white border border-gray-300 py-2.5 px-6 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200" 
+                                       href="{% url 'appointments:detail' appointment.id %}">
+                                        Cancel
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Service Details Sidebar -->
+                <aside class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-xl p-6 sticky top-24">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-uh-blue-100 flex items-center justify-center">
+                                <!-- Icon: Calendar -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-uh-blue-700">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">Service Details</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Provider</dt>
+                                <dd class="mt-1 text-gray-900 font-semibold">{{ appointment.provider.get_full_name }}</d>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Date</dt>
+                                <dd class="mt-1 text-gray-900 font-semibold">{{ appointment.scheduled_at|date:'F d, Y H:i' }}</dd>
+                            </div>
+                            <div class="pt-4 border-t border-gray-200">
+                                <dt class="text-sm font-medium text-gray-500">Total Amount</dt>
+                                <dd class="mt-1 text-3xl font-bold text-uh-green-600">रू {{ appointment.total_amount }}</dd>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+        <!-- End of your original {% block content %} -->
+
+    </div> <!-- End #page-content -->
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+{% load static %}
+
+{% block title %}Add Review{% endblock %}
+
+{% block content %}
+<!-- 
+  This is a full HTML file for demonstration.
+  In your Django project, you will only need to copy the 
+  <style> block into your base.html <head> (if not already there)
+  and the contents of <div id="page-content">...</div> 
+  to replace your original add_review.html block.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use the title from your block -->
+    <title>Add Review - UH Care</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        // Configuration for Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'uh-blue': {
+                            '700': '#004a9e', // Darker Blue from logo
+                            '600': '#0056b3',
+                            '100': '#e6f0ff',
+                        },
+                        'uh-green': {
+                            '600': '#4CAF50', // Green from logo
+                            '100': '#eaf7ea',
+                        },
+                        'uh-red': {
+                            '600': '#D32F2F', // Red from logo heartbeat
+                            '100': '#fbe9e9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Styles moved to shared stylesheet: static/css/compat.css -->
+    <link rel="stylesheet" href="{% static 'css/compat.css' %}">
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <!-- 
+                      ****************************************************
+                      * IMPORTANT: Replace 'YOUR_LOGO_URL_HERE.jpg'
+                      * with the public URL of your hosted logo.
+                      ****************************************************
+                    -->
+                    <img class="h-10 w-auto" 
+                         src="YOUR_LOGO_URL_HERE.jpg" 
+                         alt="UH Care Logo"
+                         onerror="this.src='https://placehold.co/150x40/004a9e/ffffff?text=UH+Care&font=inter'; this.onerror=null;">
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- This div wraps your actual page content -->
+    <div id="page-content">
+
+    <!-- This is your original &#123;% block content %&#125; -->
+        <div class="container" style="max-width:760px; margin:2rem auto;">
+            <!-- Added a styled card for a professional look -->
+            <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+                <div class="p-6 sm:p-8">
+                    
+                    <h1 class="text-3xl font-bold text-uh-blue-700 mb-6">Leave a Review</h1>
+        
+                    <form method="post" class="review-form" action="{% url 'appointments:add_appointment_review' appointment.id %}">
+                        {% csrf_token %}
+                
+                        <div class="form-group">
+                            <label for="id_rating">Rating</label>
+                            <!-- Django renders this, it will be styled by the .form-control / form select rules -->
+                            <select name="rating" id="id_rating" class="form-control">
+                                <option value="" disabled selected>Select your rating...</option>
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Very Good</option>
+                                <option value="3">3 - Good</option>
+                                <option value="2">2 - Fair</option>
+                                <option value="1">1 - Poor</option>
+                            </select>
+                        </div>
+                
+                        <div class="form-group">
+                            <label for="id_review_text">Comment</label>
+                            <!-- Django renders this, it will be styled by the .form-control / form textarea rules -->
+                            <textarea name="review_text" id="id_review_text" class="form-control" rows="5" placeholder="Share your experience..."></textarea>
+                        </div>
+                
+                        <div class="form-group">
+                            <label>Would you recommend?</label>
+                            <!-- Styled radio buttons -->
+                            <div class="flex items-center space-x-6 mt-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="would_recommend" value="yes" id="rec_yes" class="form-radio">
+                                    <label for="rec_yes" class="ml-2 block text-sm font-medium text-gray-800">Yes</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="would_recommend" value="no" checked id="rec_no" class="form-radio">
+                                    <label for="rec_no" class="ml-2 block text-sm font-medium text-gray-800">No</label>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <!-- Styled button -->
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <button type="submit" class="w-full sm:w-auto bg-uh-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">
+                                Submit Review
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of your original {% block content %} -->
+
+    </div> <!-- End #page-content -->
+
+</body>
+</html>

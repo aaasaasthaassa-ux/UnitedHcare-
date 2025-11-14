@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}UH Care - United Home Care{% endblock %}</title>
+    {% load static %}
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Tailwind Forms Plugin (for styled inputs, selects, etc.) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+    <script>
+        // Configuration for Tailwind to use your brand colors
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'uh-blue': {
+                            '700': '#004a9e', // Darker Blue from logo
+                            '600': '#0056b3',
+                            '100': '#e6f0ff',
+                        },
+                        'uh-green': {
+                            '600': '#4CAF50', // Green from logo
+                            '500': '#66BB6A',
+                            '100': '#eaf7ea',
+                        },
+                        'uh-red': {
+                            '600': '#D32F2F', // Red from logo heartbeat
+                            '500': '#E53E3E',
+                            '100': '#fbe9e9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Use shared compatibility stylesheet to provide base form & alert styles
+         This replaces many inline `@apply` usages from templates so code editors
+         that don't process Tailwind/PostCSS won't flag unknown at-rules. -->
+    <link rel="stylesheet" href="{% static 'css/compat.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo & Brand (Left) -->
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'accounts:home' %}" class="flex items-center gap-3">
+                        {# Circular UH Care logo. Place your logo at static/images/uh-care-logo.png #}
+                        <img class="h-10 w-10 rounded-full object-cover bg-white" 
+                             src="{% static 'images/uh-care-logo.png' %}" 
+                             alt="UH Care Logo"
+                             onerror="this.src='https://placehold.co/80x80/004a9e/ffffff?text=UH'; this.onerror=null;">
+
+                        {# Optional short brand text for accessibility/SEO (visually hidden) #}
+                        <span class="sr-only">UH Care</span>
+
+                        {# Rectangular side image shown on md+ screens. Keep hidden on small screens. #}
+                        <img src="{% static 'images/side-image.png' %}" alt="" class="hidden md:block h-10 rounded-md object-cover" onerror="this.style.display='none'" />
+                    </a>
+                </div>
+                
+                <!-- Desktop Menu (Hidden on Mobile) -->
+                <div class="hidden md:flex md:items-center md:gap-4">
+                    <a href="{% url 'services:list' %}" class="text-gray-600 hover:text-uh-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Services</a>
+                    <a href="{% url 'appointments:provider_directory' %}" class="text-gray-600 hover:text-uh-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Providers</a>
+                    <a href="{% url 'pharmacy:list' %}" class="text-gray-600 hover:text-uh-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Pharmacy</a>
+                    <a href="{% url 'blog:list' %}" class="text-gray-600 hover:text-uh-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Blog</a>
+                    <a href="{% url 'equipment:list' %}" class="text-gray-600 hover:text-uh-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Equipment</a>
+
+                    <!-- Icons (Desktop) -->
+                    {% if user.is_authenticated %}
+                        <!-- Notification Bell (Desktop) -->
+                        <div class="relative" id="notificationBell">
+                            <button type="button" class="relative text-gray-500 hover:text-uh-blue-700 p-2" onclick="toggleNotifications()">
+                                <!-- Icon: Bell -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                                </svg>
+                                <span class="absolute -top-1 -right-1 w-4 h-4 bg-uh-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center" id="notificationCount">0</span>
+                            </button>
+                            <!-- Notification Dropdown -->
+                            <div id="notificationDropdown" class="hidden absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                                <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                                    <strong class="text-gray-800">Notifications</strong>
+                                    <a href="#" onclick="markAllRead(); return false;" class="text-xs font-medium text-uh-blue-700 hover:underline">Mark all read</a>
+                                </div>
+                                <div id="notificationList" class="max-h-96 overflow-y-auto">
+                                    <!-- Notifications loaded via AJAX -->
+                                    <div class="p-4 text-center text-sm text-gray-500">Loading...</div>
+                                </div>
+                                <div class="p-2 bg-gray-50 border-t border-gray-200">
+                                    <a href="{% url 'notifications:list' %}" class="block text-center w-full px-4 py-2 text-sm font-medium text-uh-blue-700 hover:bg-gray-100 rounded-md">View All</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wishlist (Desktop) -->
+                        <a href="{% url 'services:wishlist' %}" class="relative text-gray-500 hover:text-uh-red-600 p-2" title="Wishlist">
+                            <!-- Icon: Heart -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                            </svg>
+                            {% if wishlist_count %}
+                                <span class="absolute -top-1 -right-1 w-4 h-4 bg-uh-blue-700 text-white text-xs font-bold rounded-full flex items-center justify-center" id="wishlistCount">{{ wishlist_count }}</span>
+                            {% endif %}
+                        </a>
+
+                        <!-- Cart (Desktop) -->
+                        <a href="{% url 'pharmacy:cart' %}" class="relative text-gray-500 hover:text-uh-blue-700 p-2" title="Cart">
+                            <!-- Icon: Cart -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                            </svg>
+                            {% if cart_count %}
+                                <span class="absolute -top-1 -right-1 w-4 h-4 bg-uh-blue-700 text-white text-xs font-bold rounded-full flex items-center justify-center" id="cartCount">{{ cart_count }}</span>
+                            {% endif %}
+                        </a>
+                    {% endif %}
+
+                    <!-- Auth Links (Desktop) -->
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard:home' %}" class="text-gray-600 hover:text-uh-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
+                        <a href="{% url 'accounts:profile' %}" class="text-gray-600 hover:text-uh-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Profile</a>
+                        <a href="{% url 'accounts:logout' %}" class="text-uh-red-600 hover:bg-uh-red-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Logout</a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="text-gray-600 hover:text-uh-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Login</a>
+                        <a href="{% url 'accounts:register_patient' %}" class="ml-2 bg-uh-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-sm">
+                            Get Started
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Mobile Menu Button (Visible on Mobile) -->
+                <div class="md:hidden flex items-center">
+                    <!-- Mobile Icons -->
+                    {% if user.is_authenticated %}
+                        <!-- Notification Bell (Mobile) -->
+                        <div class="relative" id="notificationBellMobile">
+                            <button type="button" class="relative text-gray-500 hover:text-uh-blue-700 p-2" onclick="toggleNotifications()">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                                <span class="absolute -top-1 -right-1 w-4 h-4 bg-uh-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center notificationCountMobile">0</span>
+                            </button>
+                            <!-- Mobile dropdown is the same element as desktop, just positioned by its parent -->
+                        </div>
+                        <!-- Wishlist (Mobile) -->
+                        <a href="{% url 'services:wishlist' %}" class="relative text-gray-500 hover:text-uh-red-600 p-2" title="Wishlist">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
+                            {% if wishlist_count %}
+                                <span class="absolute -top-1 -right-1 w-4 h-4 bg-uh-blue-700 text-white text-xs font-bold rounded-full flex items-center justify-center" id="wishlistCountMobile">{{ wishlist_count }}</span>
+                            {% endif %}
+                        </a>
+                        <!-- Cart (Mobile) -->
+                        <a href="{% url 'pharmacy:cart' %}" class="relative text-gray-500 hover:text-uh-blue-700 p-2" title="Cart">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
+                            {% if cart_count %}
+                                <span class="absolute -top-1 -right-1 w-4 h-4 bg-uh-blue-700 text-white text-xs font-bold rounded-full flex items-center justify-center" id="cartCountMobile">{{ cart_count }}</span>
+                            {% endif %}
+                        </a>
+                    {% endif %}
+
+                    <!-- Hamburger Button -->
+                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-uh-blue-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-uh-blue-600" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <!-- Icon when menu is closed. -->
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
+                        <!-- Icon when menu is open. -->
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="{% url 'services:list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-uh-blue-700 hover:bg-gray-50">Services</a>
+                <a href="{% url 'appointments:provider_directory' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-uh-blue-700 hover:bg-gray-50">Providers</a>
+                <a href="{% url 'pharmacy:list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-uh-blue-700 hover:bg-gray-50">Pharmacy</a>
+                <a href="{% url 'blog:list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-uh-blue-700 hover:bg-gray-50">Blog</a>
+                <a href="{% url 'equipment:list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-uh-blue-700 hover:bg-gray-50">Equipment</a>
+                
+                <div class="pt-4 pb-2 border-t border-gray-200">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard:home' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-uh-blue-700 hover:bg-gray-50">Dashboard</a>
+                        <a href="{% url 'appointments:my_appointments' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-uh-blue-700 hover:bg-gray-50">My Appointments</a>
+                        <a href="{% url 'accounts:profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-uh-blue-700 hover:bg-gray-50">Profile</a>
+                        <a href="{% url 'accounts:logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-uh-red-600 hover:bg-uh-red-100">Logout</a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-uh-blue-700 hover:bg-gray-50">Login</a>
+                        <a href="{% url 'accounts:register_patient' %}" class_alias="btn btn-primary" class="block w-full text-center mt-2 bg-uh-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-uh-blue-600 transition-all duration-200">
+                            Get Started
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Django Messages Framework -->
+    {% if messages %}
+    <div id="messages-container" class="fixed top-20 right-4 z-[100] w-full max-w-sm space-y-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <span class="font-medium">{{ message.tags|title }}:</span> {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 mt-16">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+                <!-- Footer Section 1: Brand -->
+                <div class="col-span-2 lg:col-span-2">
+                    <a href="{% url 'accounts:home' %}" class="flex items-center gap-2">
+                        <img class="h-10 w-auto" 
+                             src="YOUR_LOGO_URL_HERE.jpg" 
+                             alt="UH Care Logo"
+                             onerror="this.src='https://placehold.co/150x40/ffffff/004a9e?text=UH+Care&font=inter'; this.onerror=null;">
+                    </a>
+                    <p class="mt-4 text-sm text-gray-400">
+                        Professional home healthcare services across Nepal.
+                    </p>
+                </div>
+                
+                <!-- Footer Section 2: Services -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-100 tracking-wider uppercase">Services</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="{% url 'services:list' %}" class="text-sm text-gray-400 hover:text-white transition-colors">Browse Services</a></li>
+                        <li><a href="{% url 'appointments:provider_directory' %}" class="text-sm text-gray-400 hover:text-white transition-colors">Providers</a></li>
+                        <li><a href="{% url 'equipment:list' %}" class="text-sm text-gray-400 hover:text-white transition-colors">Medical Equipment</a></li>
+                        <li><a href="{% url 'pharmacy:list' %}" class="text-sm text-gray-400 hover:text-white transition-colors">Pharmacy</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Footer Section 3: Company -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-100 tracking-wider uppercase">Company</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="{% url 'accounts:about' %}" class="text-sm text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="{% url 'accounts:contact' %}" class="text-sm text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Footer Section 4: Support -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-100 tracking-wider uppercase">Support</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-sm text-gray-400 hover:text-white transition-colors">FAQs</a></li>
+                    </ul>
+                </div>
+
+                <!-- Footer Section 5: Contact -->
+                <div class="col-span-2 lg:col-span-1">
+                    <h3 class="text-sm font-semibold text-gray-100 tracking-wider uppercase">Contact</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="tel:+9779816582615" class="text-sm text-gray-400 hover:text-white transition-colors">9816582615</a></li>
+                        <li><a href="mailto:unitedcare.npl@gmail.com" class="text-sm text-gray-400 hover:text-white transition-colors">unitedcare.npl@gmail.com</a></li>
+                    </ul>
+                    <div class="flex gap-4 mt-4">
+                        <!-- Social Icons -->
+                        <a href="https://www.facebook.com/share/16RWDCSG7V/" target="_blank" rel="noopener noreferrer" aria-label="UH Care on Facebook" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
+                        </a>
+                        <a href="https://www.instagram.com/uh.nepal?igsh=MTMxZnRnMW90MjJsaQ==" target="_blank" rel="noopener noreferrer" aria-label="UH Care on Instagram" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12.315 2c-2.43 0-2.784.011-3.808.06-1.064.049-1.791.218-2.427.465a4.902 4.902 0 00-1.772 1.153 4.902 4.902 0 00-1.153 1.772c-.247.636-.416 1.363-.465 2.427C2.011 9.531 2 9.885 2 12.315s.011 2.784.06 3.808c.049 1.064.218 1.791.465 2.427a4.902 4.902 0 001.153 1.772 4.902 4.902 0 001.772 1.153c.636.247 1.363.416 2.427.465C9.531 22.011 9.885 22 12.315 22s2.784-.011 3.808-.06c1.064-.049 1.791-.218 2.427-.465a4.902 4.902 0 001.772-1.153 4.902 4.902 0 001.153-1.772c.247-.636.416-1.363.465-2.427.049-1.024.06-1.378.06-3.808s-.011-2.784-.06-3.808c-.049-1.064-.218-1.791-.465-2.427a4.902 4.902 0 00-1.153-1.772A4.902 4.902 0 0018.55.525c-.636-.247-1.363-.416-2.427-.465C15.099 2.011 14.745 2 12.315 2zm0 1.62c2.403 0 2.688.01 3.637.052.932.042 1.48.199 1.857.344.457.182.8.398 1.15.748.35.35.566.693.748 1.15.145.377.302.925.344 1.857.043.95.052 1.234.052 3.637s-.01 2.688-.052 3.637c-.042.932-.199 1.48-.344 1.857-.182.457-.398.8-.748 1.15-.35.35-.693.566-1.15.748-.377.145-.925.302-1.857.344-.95.043-1.234.052-3.637.052s-2.688-.01-3.637-.052c-.932-.042-1.48-.199-1.857-.344-.457-.182-.8-.398-1.15-.748-.35-.35-.566-.693-.748-1.15-.145-.377-.302-.925-.344-1.857-.043-.95-.052-1.234-.052-3.637s.01-2.688.052-3.637c.042-.932.199-1.48.344-1.857.182-.457.398-.8.748-1.15.35-.35.693-.566 1.15-.748.377-.145.925-.302 1.857-.344.95-.043 1.234-.052 3.637-.052zM12 6.865A5.135 5.135 0 1012 17.135 5.135 5.135 0 0012 6.865zm0 8.63A3.5 3.5 0 1112 8.5a3.5 3.5 0 010 7zm4.865-9.118a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z" clip-rule="evenodd" /></svg>
+                        </a>
+                        <a href="https://wa.me/9779816582625" target="_blank" rel="noopener noreferrer" aria-label="Chat with UH Care on WhatsApp" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.79.46 3.48 1.28 4.94L2 22l5.3-1.38c1.37.75 2.92 1.18 4.56 1.18h.1c5.46 0 9.9-4.45 9.9-9.91s-4.44-9.9-9.9-9.9zM17 15.45c-.14-.28-.5-..43-1.04-.69-.54-.27-3.2-1.58-3.7-1.75-.5-.17-.86-.27-1.22.27-.36.54-1.4 1.75-1.72 2.1-.32.36-.64.4-.96.14-.32-.27-1.35-.5-2.57-1.58C4.84 12.8 4.3 11.78 4.13 11.4c-.17-.36-.02-.55.24-.81.24-.24.54-.64.81-.96.27-.32.36-.54.54-.9.18-.36.09-.64-.05-.9-.14-.27-.64-1.54-.88-2.1-.24-.57-.48-.48-.64-.48-.17 0-.36 0-.54.05-.18.05-.48.18-.73.43-.25.25-.97.94-1.2 1.75-.24.81-.24 1.5.05 2.23.28.72 1.2 2.2 2.73 3.65 1.83 1.75 3.3 2.33 4.6 2.6.36.1.9.17 1.22.1.48-.1 1.5-.6 1.7-1.18.2-.58.2-1.08.14-1.18z" /></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 pt-8 border-t border-gray-700 text-sm text-center text-gray-400">
+                <p>&copy; 2024 UH Care (United Home Care). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+    // Auto-dismiss messages after 5 seconds
+    setTimeout(() => {
+        const messages = document.getElementById('messages-container');
+        if (messages) {
+            messages.style.opacity = '0';
+            messages.style.transition = 'opacity 0.5s';
+            setTimeout(() => messages.remove(), 500);
+        }
+    }, 5000);
+
+    // --- Mobile Menu Toggle ---
+    const menuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const openIcon = menuButton.querySelector('svg.block');
+    const closeIcon = menuButton.querySelector('svg.hidden');
+
+    menuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        openIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+
+    // --- Notification Bell Logic ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Update unread count periodically
+    function updateNotificationCount() {
+        fetch('/notifications/unread-count/')
+            .then(response => response.json())
+            .then(data => {
+                const count = data.unread_count || 0;
+                // Update both desktop and mobile badges
+                document.getElementById('notificationCount').textContent = count;
+                document.querySelectorAll('.notificationCountMobile').forEach(el => el.textContent = count);
+                // Show/hide badges
+                document.getElementById('notificationCount').style.display = count > 0 ? 'flex' : 'none';
+                document.querySelectorAll('.notificationCountMobile').forEach(el => el.style.display = count > 0 ? 'flex' : 'none');
+            })
+            .catch(err => console.debug('Unread count error', err));
+    }
+
+    // Toggle dropdown and optionally load recent notifications
+    function toggleNotifications() {
+        const dropdown = document.getElementById('notificationDropdown');
+        const isHidden = dropdown.classList.toggle('hidden');
+        
+        if (!isHidden) {
+            // Try to load a short list of recent notifications (non-blocking)
+            fetch('/notifications/recent/')
+                .then(res => res.ok ? res.text() : Promise.reject('no recent endpoint'))
+                .then(html => {
+                    const list = document.getElementById('notificationList');
+                    if (list) list.innerHTML = html;
+                })
+                .catch(() => {
+                    const list = document.getElementById('notificationList');
+                    if(list) list.innerHTML = '<div class="p-4 text-center text-sm text-gray-500">Could not load notifications.</div>';
+                });
+        }
+    }
+
+    function markAllRead() {
+        fetch('/notifications/mark-all-read/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                updateNotificationCount();
+                // Reload list
+                toggleNotifications(); // close
+                toggleNotifications(); // and re-open to refresh
+            }
+        })
+        .catch(err => console.debug('markAllRead error', err));
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const bell = document.getElementById('notificationBell');
+        const bellMobile = document.getElementById('notificationBellMobile');
+        const dropdown = document.getElementById('notificationDropdown');
+        
+        if (!dropdown) return;
+
+        // Check if click is outside the bell and the dropdown
+        const isOutsideBell = bell && !bell.contains(event.target);
+        const isOutsideBellMobile = bellMobile && !bellMobile.contains(event.target);
+        const isOutsideDropdown = !dropdown.contains(event.target);
+
+        if ((isOutsideBell || !bell) && (isOutsideBellMobile || !bellMobile) && isOutsideDropdown) {
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    // Initial load and periodic refresh
+    document.addEventListener('DOMContentLoaded', () => {
+        updateNotificationCount();
+        setInterval(updateNotificationCount, 30000); // every 30s
+    });
+    </script>
+</body>
+</html>

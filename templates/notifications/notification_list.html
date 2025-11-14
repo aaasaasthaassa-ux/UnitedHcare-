@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications - UH Care{% endblock %}
+
+{# Put any small page-specific CSS in extra_css if needed. base.html already loads Tailwind and compat.css #}
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <!-- Notifications Header -->
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-uh-blue-700">Notifications</h1>
+                <p class="text-gray-600 mt-1">{{ unread_count }} unread notification{{ unread_count|pluralize }}</p>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="flex items-center gap-2 rounded-lg bg-gray-200 p-1 self-start sm:self-center">
+                <a href="?filter=all" 
+                   class="py-1.5 px-4 rounded-md text-sm font-medium transition-all {% if filter_type == 'all' %}bg-white text-uh-blue-700 shadow-sm{% else %}text-gray-600 hover:text-gray-900{% endif %}">All</a>
+                <a href="?filter=unread" 
+                   class="py-1.5 px-4 rounded-md text-sm font-medium transition-all {% if filter_type == 'unread' %}bg-white text-uh-blue-700 shadow-sm{% else %}text-gray-600 hover:text-gray-900{% endif %}">Unread</a>
+                <a href="?filter=read" 
+                   class="py-1.5 px-4 rounded-md text-sm font-medium transition-all {% if filter_type == 'read' %}bg-white text-uh-blue-700 shadow-sm{% else %}text-gray-600 hover:text-gray-900{% endif %}">Read</a>
+            </div>
+        </div>
+
+        {% if unread_count > 0 %}
+        <div class="mb-4">
+            <button onclick="markAllAsRead()" class="btn btn-secondary">Mark All as Read</button>
+        </div>
+        {% endif %}
+
+        {% if notifications %}
+        <div class="space-y-4">
+            {% for notification in notifications %}
+            <article id="notification-{{ notification.id }}" 
+                     class="rounded-lg shadow-lg overflow-hidden transition-all duration-300 {% if not notification.is_read %}bg-uh-blue-100 border-l-4 border-uh-blue-700{% else %}bg-white{% endif %}">
+                <div class="flex gap-4 p-5">
+                    <!-- Icon -->
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center {% if not notification.is_read %}bg-uh-blue-700 text-white{% else %}bg-gray-100 text-uh-blue-700{% endif %}">
+                            {% if 'appointment' in notification.notification_type %}
+                            <!-- appointment icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25"/></svg>
+                            {% elif 'payment' in notification.notification_type %}
+                            <!-- payment icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75"/></svg>
+                            {% elif 'order' in notification.notification_type %}
+                            <!-- order icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118"/></svg>
+                            {% else %}
+                            <!-- generic icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31"/></svg>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start gap-3">
+                            <div class="min-w-0">
+                                <h3 class="text-lg font-semibold text-gray-900">{{ notification.title }}</h3>
+                                <p class="text-gray-700 mt-1">{{ notification.message }}</p>
+                            </div>
+                            {% if not notification.is_read %}
+                            <span class="w-2.5 h-2.5 bg-uh-blue-700 rounded-full flex-shrink-0 mt-2" title="Unread"></span>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mt-4 pt-4 border-t {% if not notification.is_read %}border-uh-blue-200{% else %}border-gray-200{% endif %}">
+                            <span class="text-sm text-gray-500">{{ notification.created_at|timesince }} ago</span>
+                            <div class="flex gap-2 self-end sm:self-center">
+                                {% if notification.action_url %}
+                                <a href="{{ notification.action_url }}" class="btn btn-primary btn-small">{{ notification.action_text }}</a>
+                                {% endif %}
+
+                                {% if not notification.is_read %}
+                                <button data-id="{{ notification.id }}" class="btn btn-secondary btn-small mark-read-btn">Mark as Read</button>
+                                {% endif %}
+
+                                <button data-id="{{ notification.id }}" class="btn btn-danger-outline btn-small delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center p-12 bg-white rounded-lg shadow-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31"/></svg>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-2">No notifications</h3>
+            <p class="text-gray-600">You're all caught up!</p>
+        </div>
+        {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('delete-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        function openModal() {
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function closeModal() {
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            if (confirmDeleteBtn) confirmDeleteBtn.dataset.id = '';
+        }
+
+        if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', closeModal);
+        if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                if (!id) return;
+                fetch(`/notifications/delete/${id}/`, { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } })
+                .then(r => r.json()).then(data => {
+                    if (data.success) {
+                        const el = document.getElementById(`notification-${id}`);
+                        if (el) { el.style.transition = 'opacity 0.3s ease-out'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }
+                        closeModal();
+                    }
+                });
+            });
+        }
+
+        window.markAllAsRead = function() {
+            fetch('/notifications/mark-all-read/', { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } })
+            .then(r => r.json()).then(data => { if (data.success) location.reload(); });
+        };
+
+        document.addEventListener('click', function(e) {
+            const markBtn = e.target.closest('.mark-read-btn');
+            if (markBtn) {
+                const id = markBtn.dataset.id;
+                fetch(`/notifications/mark-read/${id}/`, { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } })
+                .then(r => r.json()).then(data => { if (data.success) location.reload(); });
+                return;
+            }
+
+            const delBtn = e.target.closest('.delete-btn');
+            if (delBtn) {
+                const id = delBtn.dataset.id;
+                if (confirmDeleteBtn) confirmDeleteBtn.dataset.id = id;
+                openModal();
+                return;
+            }
+        });
+    });
+    </script>
+{% endblock %}

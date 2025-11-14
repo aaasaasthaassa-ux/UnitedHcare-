@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        /* UH Care Brand Colors */
+        :root {
+            --uh-blue: #004a9e;
+            --uh-green: #4CAF50;
+            --uh-red: #D32F2F;
+            --uh-blue-light: #0056b3;
+        }
+
+        body {
+            /* This is an excellent, professional font stack for email */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1d1d1f;
+            background-color: #f5f5f7; /* Light gray page background */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff; /* Card background */
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        .header {
+            /* Branded gradient using your logo's colors */
+            background: linear-gradient(135deg, var(--uh-blue), var(--uh-green));
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .logo {
+            /* Constrains the logo size */
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            margin-top: 0;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+        .message {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: var(--uh-blue); /* Branded button color */
+            color: white !important; /* Use !important for email client compatibility */
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        /* Hover state for webmail clients that support it */
+        .button:hover {
+            background: var(--uh-blue-light);
+        }
+        .footer {
+            background: #f5f5f7; /* Light gray footer background */
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #6e6e73;
+        }
+        .footer a {
+            color: var(--uh-blue); /* Branded link color */
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- 
+              ****************************************************
+              * IMPORTANT: Replace 'YOUR_LOGO_URL_HERE.jpg'
+              * with the public URL of your hosted logo.
+              * This must be an absolute URL (https://...)
+              ****************************************************
+            -->
+            <img src="YOUR_LOGO_URL_HERE.jpg" 
+                 alt="{{ site_name }} Logo" 
+                 class="logo"
+                 onerror="this.style.display='none';">
+
+            <h1>{{ site_name }}</h1>
+        </div>
+        
+        <div class="content">
+            <h2 style="margin-top: 0;">{{ title }}</h2>
+            <div class="message">
+                {{ message|linebreaks }}
+            </div>
+            
+            {% if action_url %}
+            <div style="text-align: center;">
+                <a href="{{ action_url }}" class="button">View Details</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <p>Thank you for choosing {{ site_name }}</p>
+            <p>
+                <a href="#">Unsubscribe</a> | 
+                <a href="#">Notification Preferences</a>
+            </p>
+            <p style="margin-top: 20px; font-size: 12px;">
+                © {{ site_name }}. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

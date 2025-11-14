@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blog - UH Care{% endblock %}
+
+{% block content %}
+{% include 'partials/video_hero.html' with title="UH Care Blog" subtitle="Insights, tips, and news on home healthcare" %}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for post in posts %}
+        <article class="bg-white rounded-lg shadow-sm overflow-hidden">
+            {% if post.featured_image %}
+            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-44 object-cover">
+            {% else %}
+            <div class="w-full h-44 bg-uh-blue-100 flex items-center justify-center text-gray-600">No Image</div>
+            {% endif %}
+            <div class="p-4">
+                <h2 class="text-lg font-semibold text-gray-900"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
+                <p class="text-sm text-gray-500 mt-2">{{ post.excerpt|default:post.content|truncatechars:140 }}</p>
+                <div class="mt-4 flex items-center justify-between">
+                    <a href="{{ post.get_absolute_url }}" class="text-uh-blue-700 font-medium">Read more →</a>
+                    <time class="text-xs text-gray-400">{{ post.published_at|date:'M j, Y' }}</time>
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <p class="text-gray-600">No posts yet.</p>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <div class="mt-8">
+        <nav class="flex justify-center items-center gap-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 border rounded">Previous</a>
+            {% endif %}
+            <span class="px-3 py-1">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 border rounded">Next</a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

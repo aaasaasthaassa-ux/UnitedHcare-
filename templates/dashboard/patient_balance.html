@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Balance - UH Care{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-uh-blue-700">Financial Summary</h1>
+        <p class="text-lg text-gray-600 mt-2">Overview of your current financial obligation and payment status</p>
+    </div>
+
+    <!-- Professional Stat Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        <!-- Card 1: Total Amount -->
+        <div class="bg-white rounded-lg shadow-xl p-6 flex flex-col">
+            <div class="flex items-center gap-4">
+                <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-uh-blue-100 rounded-full">
+                    <!-- Icon: Banknotes -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-uh-blue-700">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.75A.75.75 0 013 4.5h.75m0 0A.75.75 0 013.75 6v.75m0 0v-.75A.75.75 0 013.75 6h.75m0 0V4.5A.75.75 0 013.75 3h.75m0 0v.75A.75.75 0 013 4.5h-.75m0 0h-.75A.75.75 0 011.5 6v.75m0 0V6A.75.75 0 012.25 5.25h.75M3.75 15v.75A.75.75 0 013 16.5h-.75m0 0v-.75A.75.75 0 013 15h.75m0 0A.75.75 0 013.75 16.5v.75m0 0v-.75A.75.75 0 013.75 15h.75m0 0v-.75A.75.75 0 013.75 13.5h.75m0 0V15A.75.75 0 013.75 15h-.75m0 0h-.75A.75.75 0 011.5 16.5v.75m0 0V16.5A.75.75 0 012.25 15.75h.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-medium text-gray-600">Total Amount (Gross)</div>
+                    <div class="text-3xl font-extrabold text-gray-900 mt-1">रू {{ gross_total|default:0|floatformat:2 }}</div>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">Includes services, pharmacy, and equipment charges.</p>
+        </div>
+
+        <!-- Card 2: Paid Amount (Green) -->
+        <div class="bg-white rounded-lg shadow-xl p-6 flex flex-col">
+            <div class="flex items-center gap-4">
+                <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-uh-green-100 rounded-full">
+                    <!-- Icon: Check Circle -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-uh-green-600">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-medium text-gray-600">Paid Amount</div>
+                    <div class="text-3xl font-extrabold text-uh-green-600 mt-1">रू {{ paid_amount|default:0|floatformat:2 }}</div>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">Amount already settled.</p>
+        </div>
+
+        <!-- Card 3: Unpaid Amount (Red) -->
+        <div class="bg-white rounded-lg shadow-xl p-6 flex flex-col">
+            <div class="flex items-center gap-4 flex-grow">
+                <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-uh-red-100 rounded-full">
+                    <!-- Icon: Exclamation Triangle -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-uh-red-600">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-medium text-gray-600">Unpaid Amount (Net)</div>
+                    <div class="text-3xl font-black text-uh-red-600 mt-1">रू {{ net_unpaid|default:0|floatformat:2 }}</div>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                {% if net_unpaid and net_unpaid > 0 %}
+                    <a href="{% url 'payments:history' %}?status=unpaid" class="w-full block text-center bg-uh-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-uh-red-500 focus:outline-none focus:ring-2 focus:ring-uh-red-600 focus:ring-offset-2 transition-all duration-200">
+                        Pay Now
+                    </a>
+                {% else %}
+                    <a href="{% url 'payments:history' %}" class="w-full block text-center font-semibold text-gray-700 bg-white border border-gray-300 py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200">
+                        View payments
+                    </a>
+                {% endif %}
+                <p class="text-xs text-gray-500 mt-3">Note: Unpaid = Total − Paid. Cash commitments may be excluded.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Column: Recent Payments -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-xl">
+                <h3 class="text-xl font-semibold text-gray-900 p-6 border-b border-gray-200">Recent Actionable Payments</h3>
+
+                {% if payments %}
+                    <ul class="divide-y divide-gray-200">
+                        {% for p in payments %}
+                            <li class="group">
+                                <a href="{% url 'payments:detail' p.id %}" class="block p-6 hover:bg-gray-50 transition-colors duration-200">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <!-- Icon + Details -->
+                                        <div class="flex items-center gap-4">
+                                            <!-- Icon for payment type -->
+                                            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-uh-blue-100 rounded-full">
+                                                {% if p.appointment %}
+                                                    <!-- Icon: Calendar -->
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-uh-blue-700">
+                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                                    </svg>
+                                                {% elif p.pharmacy_order %}
+                                                    <!-- Icon: Pill -->
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-uh-blue-700">
+                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-3.857 2.25M12 21.75l-5.571-3m5.571 3l5.571-3m-5.571 0V12m0 0l5.571 3M12 12l-5.571 3" />
+                                                    </svg>
+                                                {% elif p.equipment_purchase %}
+                                                    <!-- Icon: Box -->
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-uh-blue-700">
+                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10.5 11.25h3M12 15V7.5" />
+                                                    </svg>
+                                                {% elif p.equipment_rental %}
+                                                    <!-- Icon: Refresh -->
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-uh-blue-700">
+                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                                    </svg>
+                                                {% else %}
+                                                    <!-- Icon: Dollar -->
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-uh-blue-700">
+                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0l.879-.659M12 6l-3.879-2.91a.75.75 0 01-.412-.643V2.25c0-.621.504-1.125 1.125-1.125h5.5c.621 0 1.125.504 1.125 1.125v.248c0 .26-.092.508-.266.702L12 6z" />
+                                                    </svg>
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Text -->
+                                            <div class="flex-grow">
+                                                <div class="font-semibold text-gray-900 group-hover:text-uh-blue-700">
+                                                    {% if p.appointment %}
+                                                        {{ p.appointment.service.name }}
+                                                    {% elif p.pharmacy_order %}
+                                                        Pharmacy Order #{{ p.pharmacy_order.order_number }}
+                                                    {% elif p.equipment_purchase %}
+                                                        Equipment Purchase #{{ p.equipment_purchase.order_number }}
+                                                    {% elif p.equipment_rental %}
+                                                        Equipment Rental #{{ p.equipment_rental.rental_number }}
+                                                    {% else %}
+                                                        Payment #{{ p.id }}
+                                                    {% endif %}
+                                                </div>
+                                                <div class="text-sm text-gray-500">
+                                                    {{ p.created_at|date:'F d, Y' }} •
+                                                    {% if p.appointment %}
+                                                        {{ p.get_payment_status_display|default:p.payment_status }}
+                                                    {% elif p.pharmacy_order %}
+                                                        {{ p.pharmacy_order.get_status_display }}
+                                                    {% elif p.equipment_purchase %}
+                                                        {{ p.equipment_purchase.get_status_display }}
+                                                    {% elif p.equipment_rental %}
+                                                        {{ p.equipment_rental.get_status_display }}
+                                                    {% else %}
+                                                        {{ p.get_payment_status_display|default:p.payment_status }}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Amount + Status -->
+                                        <div class="text-right flex-shrink-0 min-w-[120px]">
+                                            <div class="font-bold text-gray-900">रू {{ p.amount|floatformat:2 }}</div>
+                                            <div class="text-sm font-semibold">
+                                                {% if p.payment_status == 'unpaid' %}
+                                                    <span class="text-uh-red-600">Unpaid</span>
+                                                {% elif p.payment_status == 'pending' %}
+                                                    <span class="text-yellow-600">Pending</span>
+                                                {% else %}
+                                                    <span class="text-uh-green-600">{{ p.get_payment_status_display|default:p.payment_status }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <!-- Professional Empty State -->
+                    <div class="text-center p-12">
+                        <!-- Icon: Document -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-400 mx-auto mb-4">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                        </svg>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">No actionable payments</h3>
+                        <p class="text-gray-600">You are all caught up!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Aside Column: Profile -->
+        <aside class="lg:col-span-1 space-y-6">
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Your Profile</h3>
+                <div class="space-y-3">
+                    <div class="text-gray-600"><span class="font-medium text-gray-900">{{ profile.user.get_full_name }}</span></div>
+                    <div class="text-gray-600">Balance: <span class="font-medium text-uh-red-600">रू {{ profile.total_balance|floatformat:2 }}</span></div>
+                    <div class="text-gray-600">Blood Group: <span class="font-medium text-gray-900">{{ profile.blood_group|default:'N/A' }}</span></div>
+                </div>
+
+                {% if cash_committed and cash_committed > 0 %}
+                    <!-- Branded Callout Box -->
+                    <div class="mt-6 bg-uh-blue-100 border-l-4 border-uh-blue-700 p-4 rounded-md">
+                        <div class="text-sm font-medium text-uh-blue-700 mb-1">Cash Commitments</div>
+                        <div class="text-xl font-bold text-uh-blue-700">रू {{ cash_committed|floatformat:2 }}</div>
+                        <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                            <a href="{% url 'payments:cash_commitments' %}" class="w-full text-center bg-uh-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-sm">
+                                View Commitments
+                            </a>
+                            <a href="{% url 'payments:history' %}" class="w-full text-center font-semibold text-gray-700 bg-white border border-gray-300 py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 text-sm">
+                                All Payments
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="mt-6 border-t border-gray-200 pt-6">
+                        <a href="{% url 'payments:history' %}" class="w-full block text-center font-semibold text-gray-700 bg-white border border-gray-300 py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200">
+                            View All Payments
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

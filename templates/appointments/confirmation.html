@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmed - UH Care{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    
+    <!-- Success Animation Section -->
+    <div class="text-center mb-8">
+        <!-- Branded success checkmark -->
+        <div class="w-20 h-20 bg-uh-green-600 text-white rounded-full flex items-center justify-center text-5xl font-bold mx-auto mb-4">
+            ✓
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Booking Confirmed!</h1>
+        <p class="text-lg text-gray-600">Your appointment has been successfully booked</p>
+    </div>
+    
+    <!-- Main Confirmation Card -->
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div class="p-6 sm:p-8">
+
+            <!-- Reference Number -->
+            <div class="text-center p-6 bg-uh-blue-100 rounded-lg mb-8">
+                <div class="text-sm font-medium text-uh-blue-700 mb-1">Your Booking Reference</div>
+                <div class="text-3xl font-bold text-uh-blue-700 font-mono">#{{ appointment.id|stringformat:"05d" }}</div>
+            </div>
+            
+            <!-- Detail Section: Service -->
+            <div class="pb-6 mb-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-uh-blue-700 mb-4">Service Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Service</span>
+                        <span class="block text-base font-semibold text-gray-900">{{ appointment.service.name }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Category</span>
+                        <span class="block text-base font-semibold text-gray-900">{{ appointment.service.category.name }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detail Section: Schedule -->
+            <div class="pb-6 mb-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-uh-blue-700 mb-4">Appointment Schedule</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Date</span>
+                        <span class="block text-base font-semibold text-gray-900">{{ appointment.appointment_date|date:"F d, Y" }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Time</span>
+                        <span class="block text-base font-semibold text-gray-900">{{ appointment.appointment_time|time:"g:i A" }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Duration</span>
+                        <span class="block text-base font-semibold text-gray-900">{{ appointment.duration_hours }} hour(s)</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Status</span>
+                        <span class="block text-base font-semibold text-gray-900">{{ appointment.get_status_display }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detail Section: Location -->
+            <div class="pb-6 mb-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-uh-blue-700 mb-4">Service Location</h2>
+                <div>
+                    <span class="block text-sm font-medium text-gray-500">Address</span>
+                    <span class="block text-base font-semibold text-gray-900">{{ appointment.service_address }}</span>
+                </div>
+            </div>
+            
+            <!-- Detail Section: Payment -->
+            <div class="pb-6 mb-6 border-b border-gray-200 last:border-b-0 last:mb-0 last:pb-0">
+                <h2 class="text-xl font-semibold text-uh-blue-700 mb-4">Payment Information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Service Price</span>
+                        {% if appointment.final_price %}
+                        <span class="block text-base font-semibold text-gray-900">रू {{ appointment.final_price }} <small class="text-xs text-gray-500">(final)</small></span>
+                        {% else %}
+                        <span class="block text-base font-semibold text-gray-900">रू {{ appointment.service_price }} <small class="text-xs text-gray-500">(estimated)</small></span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Additional Charges</span>
+                        <span class="block text-base font-semibold text-gray-900">रू {{ appointment.additional_charges }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Total Amount</span>
+                        <!-- Styled total amount in green -->
+                        <span class="block text-xl font-bold text-uh-green-600">रू {{ appointment.total_amount }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-medium text-gray-500">Payment Status</span>
+                        <span class="block text-base font-semibold text-gray-900">
+                            {% if payment %}
+                                {{ payment.get_payment_status_display }}
+                            {% else %}
+                                Pending
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Payment Instructions Box -->
+                {% if payment_pending_or_unpaid %}
+                <div class="mt-6 p-5 bg-uh-blue-100 border-l-4 border-uh-blue-600 rounded-r-lg">
+                    <h3 class="text-lg font-semibold text-uh-blue-700 mb-2">💳 Payment Instructions</h3>
+                    {% if payment.payment_status == 'pending' %}
+                        <p class="text-uh-blue-700">We've received your payment proof and it's currently <strong>pending verification</strong>. We'll notify you once it's confirmed.</p>
+                        <p class="text-sm text-uh-blue-600 mt-2">You can view the submission on the <a href="{% url 'payments:detail' payment.id %}" class="font-medium underline hover:text-uh-blue-700">payment detail page</a>.</p>
+                    {% elif payment.payment_method == 'online' %}
+                        <p class="text-uh-blue-700">To complete your payment:</p>
+                        <ol class="list-decimal list-inside ml-2 text-uh-blue-700 space-y-1 my-2">
+                            <li>Scan the QR code provided</li>
+                            <li>Make payment of रू {{ appointment.total_amount }}</li>
+                            <li>Upload payment proof</li>
+                        </ol>
+                        <!-- Styled "Pay Now" button -->
+                        <a href="{% url 'payments:qr_code' payment.id %}" class="inline-block mt-4 bg-uh-blue-700 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">
+                            Pay Now
+                        </a>
+                    {% else %}
+                        <p class="text-uh-blue-700">Payment will be collected in cash after service completion. Please keep the exact amount ready.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        
+        </div> <!-- End card p-6 -->
+
+        <!-- Action Buttons Footer -->
+        <div class="bg-gray-50 p-6 sm:p-8 border-t border-gray-200">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Secondary Button -->
+                <a href="{% url 'dashboard:home' %}" class="w-full text-center font-semibold text-gray-700 bg-white border border-gray-300 py-3 px-6 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200">
+                    Go to Dashboard
+                </a>
+                <!-- Primary Button -->
+                <a href="{% url 'services:list' %}" class="w-full text-center font-semibold text-white bg-uh-blue-700 py-3 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">
+                    Book Another Service
+                </a>
+            </div>
+        </div>
+
+    </div> <!-- End confirmation card -->
+    
+    <!-- Footer Text -->
+    <div class="text-center text-gray-500 mt-8">
+        <p class="text-sm">📧 A confirmation email has been sent to {{ user.email }}</p>
+        <p class="text-sm mt-1">You can track your appointment in the dashboard</p>
+    </div>
+</div>
+{% endblock %}

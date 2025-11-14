@@ -1,0 +1,284 @@
+{% load static %}
+
+{% block title %}Notification Preferences - UH Care{% endblock %}
+
+{% block content %}
+<!-- 
+  This is a full HTML file for demonstration.
+  In your Django project, you will only need to copy the 
+  <style> block into your base.html <head> (if not already there)
+  and the contents of <div id="page-content">...</div> 
+  to replace your original HTML block.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use the title from your block -->
+    <title>Notification Preferences - UH Care</title>
+    
+    <!-- 
+      FIX: Load Tailwind CSS and the 'forms' plugin via the CDN URL.
+      This resolves the 'require is not defined' error.
+    -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        // Configuration for Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'uh-blue': {
+                            '700': '#004a9e', // Darker Blue from logo
+                            '600': '#0056b3',
+                            '100': '#e6f0ff',
+                        },
+                        'uh-green': {
+                            '600': '#4CAF50', // Green from logo
+                            '500': '#66BB6A',
+                            '100': '#eaf7ea',
+                        },
+                        'uh-red': {
+                            '600': '#D32F2F', // Red from logo heartbeat
+                            '500': '#E53E3E',
+                            '100': '#fbe9e9',
+                        }
+                    }
+                }
+            },
+            // FIX: Removed the 'plugins' array that was causing the error.
+            // The 'forms' plugin is now loaded via the script URL above.
+        }
+    </script>
+
+    <!-- 
+      Base styles (would be in your base.html)
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <!-- 
+                      ****************************************************
+                      * IMPORTANT: Replace 'YOUR_LOGO_URL_HERE.jpg'
+                      * with the public URL of your hosted logo.
+                      ****************************************************
+                    -->
+                    <img class="h-10 w-auto" 
+                         src="YOUR_LOGO_URL_HERE.jpg" 
+                         alt="UH Care Logo"
+                         onerror="this.src='https://placehold.co/150x40/004a9e/ffffff?text=UH+Care&font=inter'; this.onerror=null;">
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- This div wraps your actual page content -->
+    <div id="page-content">
+
+    <!-- This is your original &#123;% block content %&#125; -->
+        <div class="max-w-3xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-uh-blue-700 mb-8">Notification Preferences</h1>
+            
+            <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+                <form method="post" id="preferencesForm">
+                    {% csrf_token %}
+                    
+                    <div class="p-6 sm:p-8">
+                        <!-- In-App Notifications Section -->
+                        <div class="pb-6 border-b border-gray-200">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4">In-App Notifications</h2>
+                            <div class="form-group">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="enable_in_app" {% if preferences.enable_in_app %}checked{% endif %} 
+                                           class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                    <span class="text-base text-gray-700">Enable in-app notifications</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Notifications Section -->
+                        <div class="py-6 border-b border-gray-200">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4">Email Notifications</h2>
+                            <div class="form-group mb-4">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="enable_email" {% if preferences.enable_email %}checked{% endif %} 
+                                           class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                    <span class="text-base font-semibold text-gray-800">Enable email notifications</span>
+                                </label>
+                            </div>
+                            
+                            <div class="pl-8 space-y-3">
+                                <div class="form-group">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="appointment_emails" {% if preferences.appointment_emails %}checked{% endif %} 
+                                               class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                        <span class="text-base text-gray-700">Appointment updates</span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="order_emails" {% if preferences.order_emails %}checked{% endif %} 
+                                               class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                        <span class="text-base text-gray-700">Order updates</span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="payment_emails" {% if preferences.payment_emails %}checked{% endif %} 
+                                               class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                        <span class="text-base text-gray-700">Payment confirmations</span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="marketing_emails" {% if preferences.marketing_emails %}checked{% endif %} 
+                                               class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                        <span class="text-base text-gray-700">Marketing & promotional emails</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- SMS Notifications Section -->
+                        <div class="pt-6">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4">SMS Notifications</h2>
+                            <div class="form-group mb-4">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="enable_sms" {% if preferences.enable_sms %}checked{% endif %} 
+                                           class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                    <span class="text-base font-semibold text-gray-800">Enable SMS notifications</span>
+                                </label>
+                            </div>
+                            
+                            <div class="pl-8 space-y-3">
+                                <div class="form-group">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="appointment_sms" {% if preferences.appointment_sms %}checked{% endif %} 
+                                               class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                        <span class="text-base text-gray-700">Appointment reminders</span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="order_sms" {% if preferences.order_sms %}checked{% endif %} 
+                                               class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                        <span class="text-base text-gray-700">Order delivery updates</span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="payment_sms" {% if preferences.payment_sms %}checked{% endif %} 
+                                               class="w-5 h-5 text-uh-blue-700 rounded border-gray-300 focus:ring-uh-blue-600">
+                                        <span class="text-base text-gray-700">Payment confirmations</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Footer -->
+                    <div class="px-6 sm:px-8 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-4">
+                        <button type="submit" 
+                                class="w-full sm:w-auto bg-uh-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200">
+                            Save Preferences
+                        </button>
+                        <!-- 
+                          Professional Success Message (replaces alert)
+                          Initially hidden, shown by JavaScript
+                        -->
+                        <div id="success-message" class="hidden flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-uh-green-600">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-base font-medium text-uh-green-600">Preferences saved!</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- End of your original {% block content %} -->
+
+    </div> <!-- End #page-content -->
+
+<!-- 
+  Your original script block, with one modification:
+  The alert() has been replaced to show the #success-message div
+-->
+{% block extra_js %}
+<script>
+document.getElementById('preferencesForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const successMessage = document.getElementById('success-message');
+    
+    // Hide success message before new request
+    successMessage.classList.add('hidden');
+
+    fetch('/notifications/preferences/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // **REPLACED ALERT()**
+            // Show the professional success message
+            successMessage.classList.remove('hidden');
+            
+            // Optional: Hide it after 3 seconds
+            setTimeout(() => {
+                successMessage.classList.add('hidden');
+            }, 3000);
+
+        } else {
+            // You could add error handling here
+            console.error("Failed to save preferences.");
+        }
+    });
+});
+
+// Your original getCookie function
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
+
+</body>
+</html>

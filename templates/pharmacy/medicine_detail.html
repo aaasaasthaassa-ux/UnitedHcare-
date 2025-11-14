@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ medicine.name }} - UH Care{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8">
+                
+                <!-- Image/Icon Placeholder -->
+                <div class="w-full h-64 sm:h-80 bg-gray-100 text-gray-400 rounded-lg flex items-center justify-center mb-6">
+                    <!-- Icon: Pill Bottle -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-24 h-24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a2.25 2.25 0 01-2.25 2.25H5.25a2.25 2.25 0 01-2.25-2.25v-8.25M12 4.875A2.625 2.625 0 1012 10.125 2.625 2.625 0 0012 4.875zM12 15v.001M18 5.25v.001M6 5.25v.001" />
+                    </svg>
+                </div>
+                
+                <!-- Medicine Name & Badges -->
+                <h1 class="text-3xl font-bold text-gray-900">{{ medicine.name }}</h1>
+                <p class="text-lg text-gray-600 mt-2">{{ medicine.generic_name }}</p>
+                
+                <div class="flex flex-wrap gap-3 my-6">
+                    {% if medicine.prescription_required == 'required' %}
+                    <span class="inline-flex items-center px-4 py-1 rounded-full text-sm font-medium bg-uh-red-100 text-uh-red-600">
+                        Prescription Required
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-4 py-1 rounded-full text-sm font-medium bg-uh-green-100 text-uh-green-600">
+                        Over the Counter
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <!-- Details Sections -->
+                <div class="space-y-8">
+                    <div class="pb-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-3">Description</h2>
+                        <p class="text-gray-600 leading-relaxed">{{ medicine.description }}</p>
+                    </div>
+                    
+                    <div class="pb-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-3">Uses</h2>
+                        <p class="text-gray-600 leading-relaxed">{{ medicine.uses }}</p>
+                    </div>
+                    
+                    <div class="pb-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-3">Dosage Instructions</h2>
+                        <p class="text-gray-600 leading-relaxed">{{ medicine.dosage_instructions }}</p>
+                    </div>
+                    
+                    {% if medicine.side_effects %}
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-3">Side Effects</h2>
+                        <p class="text-gray-600 leading-relaxed">{{ medicine.side_effects }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <aside class="lg:col-span-1 sticky top-24 h-fit space-y-6">
+            <!-- Price & Action Card -->
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <div class="text-center bg-uh-green-100 rounded-lg p-6 mb-6">
+                    <p class="text-4xl font-bold text-uh-green-600">रू {{ medicine.price }}</p>
+                    <p class="text-gray-600 mt-1">per {{ medicine.get_unit_type_display }}</p>
+                </div>
+                
+                {% if user.is_authenticated and medicine.in_stock and user.role != 'provider' %}
+                <form method="post" action="{% url 'pharmacy:add_to_cart' medicine.id %}" class="django-form space-y-4">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_quantity">Quantity</label>
+                        <input type="number" name="quantity" value="1" min="1" max="{{ medicine.stock_quantity }}" class="form-input" id="id_quantity">
+                    </div>
+                    <button type="submit" 
+                            class="w-full bg-uh-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-green-500 focus:outline-none focus:ring-2 focus:ring-uh-green-600 focus:ring-offset-2 transition-all duration-200 text-lg">
+                        Add to Cart
+                    </button>
+                </form>
+                {% elif user.is_authenticated and medicine.in_stock and user.role == 'provider' %}
+                <p class="text-gray-600 text-center font-medium">Available for patients only</p>
+                {% elif not user.is_authenticated %}
+                <a href="{% url 'accounts:login' %}" 
+                   class="w-full block text-center bg-uh-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-uh-blue-600 focus:outline-none focus:ring-2 focus:ring-uh-blue-700 focus:ring-offset-2 transition-all duration-200 text-lg">
+                   Login to Order
+                </a>
+                {% else %}
+                <p class="text-uh-red-600 text-center font-bold text-lg">Out of Stock</p>
+                {% endif %}
+            </div>
+            
+            <!-- Product Details Card -->
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Product Details</h3>
+                <ul class="space-y-3">
+                    <li class="flex justify-between items-center py-3 border-b border-gray-200">
+                        <span class="text-sm font-medium text-gray-600">Manufacturer:</span>
+                        <span class="text-sm font-semibold text-gray-800 text-right">{{ medicine.manufacturer|default:"N/A" }}</span>
+                    </li>
+                    <li class="flex justify-between items-center py-3 border-b border-gray-200">
+                        <span class="text-sm font-medium text-gray-600">Strength:</span>
+                        <span class="text-sm font-semibold text-gray-800 text-right">{{ medicine.strength }}</span>
+                    </li>
+                    <li class="flex justify-between items-center py-3 border-b border-gray-200">
+                        <span class="text-sm font-medium text-gray-600">Package Size:</span>
+                        <span class="text-sm font-semibold text-gray-800 text-right">{{ medicine.package_size }} {{ medicine.get_unit_type_display }}</span>
+                    </li>
+                    <li class="flex justify-between items-center py-3">
+                        <span class="text-sm font-medium text-gray-600">Stock:</span>
+                        <span class="text-sm font-semibold text-gray-800 text-right">{{ medicine.stock_quantity }} available</span>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

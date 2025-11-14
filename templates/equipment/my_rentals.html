@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Rentals - UH Care{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/compat.css' %}">
+{% endblock %}
+
+{% block content %}
+        <div class="max-w-6xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-uh-blue-700 mb-8">My Equipment Rentals</h1>
+        
+            {% if rentals %}
+                <div class="space-y-6">
+                    {% for rental in rentals %}
+                        <!-- Professional Rental Card -->
+                        <article class="bg-white rounded-lg shadow-xl p-4 sm:p-6">
+                            <div class="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
+                                <!-- Image/Fallback -->
+                                <div class="flex-shrink-0 w-full sm:w-40 h-40 sm:h-28 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                                    {% if rental.equipment.image %}
+                                        <img src="{{ rental.equipment.image.url }}" alt="{{ rental.equipment.name }}" class="w-full h-full object-cover" />
+                                    {% elif rental.equipment.image_url %}
+                                        <img src="{{ rental.equipment.image_url }}" alt="{{ rental.equipment.name }}" class="w-full h-full object-cover" />
+                                    {% else %}
+                                        <!-- Professional Icon Fallback -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-400">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 01-2.25 2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 013 12V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25V12zM12 12.75V18m0 0l-3-3m3 3l3-3m-3-6h.008v.008H12V6.75z" />
+                                        </svg>
+                                    {% endif %}
+                                </div>
+        
+                                <div class="flex-1 min-w-0">
+                                    <!-- Card Header: Title, Status -->
+                                    <div class="flex flex-col-reverse sm:flex-row justify-between sm:items-start gap-3">
+                                        <div class="min-w-0">
+                                            <h3 class="text-lg font-semibold text-gray-900 truncate">{{ rental.equipment.name }}</h3>
+                                            <div class="text-sm text-gray-600 mt-1">Rental #: <strong>{{ rental.rental_number }}</strong></div>
+                                        </div>
+                                        <div class="text-left sm:text-right flex-shrink-0">
+                                            <!-- Branded Status Badge -->
+                                            {% if rental.status == 'active' %}
+                                              <span class="py-1 px-3 rounded-full text-xs font-semibold bg-uh-green-100 text-uh-green-600">
+                                                {{ rental.get_status_display }}
+                                              </span>
+                                            {% elif rental.status == 'pending' %}
+                                              <span class="py-1 px-3 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                                                {{ rental.get_status_display }}
+                                              </span>
+                                            {% elif rental.status == 'cancelled' or rental.status == 'rejected' %}
+                                              <span class="py-1 px-3 rounded-full text-xs font-semibold bg-uh-red-100 text-uh-red-600">
+                                                {{ rental.get_status_display }}
+                                              </span>
+                                            {% else %}
+                                              <span class="py-1 px-3 rounded-full text-xs font-semibold bg-uh-blue-100 text-uh-blue-700">
+                                                {{ rental.get_status_display }}
+                                              </span>
+                                            {% endif %}
+                                            <div class="text-sm text-gray-500 mt-2">Booked on {{ rental.created_at|date:'M j, Y' }}</div>
+                                        </div>
+                                    </div>
+        
+                                    <!-- Details Grid with Icons -->
+                                    <div class="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                                        <div class="flex items-center gap-2 text-gray-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 flex-shrink-0 text-gray-500"><path fill-rule="evenodd" d="M5.75 3a.75.75 0 01.75.75v.75h.008c.84 0 1.62.24 2.27.643A4.5 4.5 0 0113.5 6.5H16a.75.75 0 010 1.5h-2.5a3 3 0 00-3-3H9.25V3.75A.75.75 0 018.5 3h-2a.75.75 0 01-.75.75v.75c0 .02.002.04.005.06A4.502 4.502 0 013.75 9H2a.75.75 0 010-1.5h1.75a3 3 0 003-3H6V3.75A.75.75 0 015.75 3zm-2.5 6A.75.75 0 014 9h1.5a3 3 0 003 3h1.25v.75a.75.75 0 01-1.5 0v-.75H6a4.5 4.5 0 01-4.495-4.44A.75.75 0 013.25 9zm13 0a.75.75 0 01.75-.75h1.75a3 3 0 00-3-3H14v.75a.75.75 0 01-1.5 0V6h1.25a4.5 4.5 0 014.495 4.44.75.75 0 01-.745.81H16a.75.75 0 01-.75-.75zM11.5 13a.75.75 0 01.75.75v.75h2.5a3 3 0 003-3H16a.75.75 0 010-1.5h1.75a4.5 4.5 0 01-4.495 4.44.75.75 0 01-.745-.81v-.75a.75.75 0 01.75-.75h2a.75.75 0 010 1.5h-2.5a3 3 0 00-3-3H10.75v.75a.75.75 0 01-1.5 0v-.75H8a4.5 4.5 0 01-4.495-4.44A.75.75 0 014.25 9H4a.75.75 0 010 1.5h.25a3 3 0 003 3h1.25v.75a.75.75 0 01-1.5 0v-.75H6a4.5 4.5 0 01-4.495 4.44.75.75 0 01-.745-.81V16a.75.75 0 011.5 0v.75h2.5a3 3 0 003 3h1.25v-.75a.75.75 0 011.5 0v.75h1.25a4.5 4.5 0 014.495-4.44.75.75 0 01.745.81v.75a.75.75 0 01-1.5 0v-.75h-2.5a3 3 0 00-3-3h-1.25v.75A.75.75 0 0111.5 13z" clip-rule="evenodd" /></svg>
+                                            <span class="font-medium">Period:</span>
+                                            <span>{{ rental.start_date|date:'M j, Y' }} — {{ rental.end_date|date:'M j, Y' }} ({{ rental.rental_days }} days)</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-gray-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 flex-shrink-0 text-gray-500"><path d="M13.5 2.5a.75.75 0 01.75.75v8.5a.75.75 0 01-1.5 0v-8.5a.75.75 0 01.75-.75zM11 5a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0v-5.5A.75.75 0 0111 5zM8.5 7a.75.75 0 01.75.75v2.5a.75.75 0 01-1.5 0v-2.5A.75.75 0 018.5 7zM6 9a.75.75 0 01.75.75v.5a.75.75 0 01-1.5 0v-.5A.75.75 0 016 9z" /><path fill-rule="evenodd" d="M17 2a.75.75 0 01.75.75v14.5a.75.75 0 01-1.5 0V2.75A.75.75 0 0117 2zM2.25 17a.75.75 0 01-.75-.75V2.75a.75.75 0 011.5 0v14.5a.75.75 0 01-.75.75z" clip-rule="evenodd" /></svg>
+                                            <span class="font-medium">Quantity:</span>
+                                            <span>{{ rental.quantity }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-gray-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 flex-shrink-0 text-gray-500"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.35 7.82a.75.75 0 01.12-1.05l.09-.09a.75.75 0 011.05.12l.9 1.2a.75.75 0 01-1.2 1.05l-.09-.09a.75.75 0 01-.12-1.05l-.9-1.2zm6.18 2.94a.75.75 0 10-1.2-1.05l-.9 1.2a.75.75 0 00.12 1.05l.09.09a.75.75 0 001.05-.12l.9-1.2zM10 11a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 11z" clip-rule="evenodd" /></svg>
+                                            <span class="font-medium">Price (rental):</span>
+                                            <span class="font-semibold text-gray-900">रू {{ rental.rental_price|floatformat:2 }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-gray-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 flex-shrink-0 text-gray-500"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5v.5c0 1.914.825 3.633 2.096 4.794.24.223.47.458.69.704v2.798A.75.75 0 009 15v1H7.75a.75.75 0 000 1.5H12.25a.75.75 0 000-1.5H11v-1a.75.75 0 00-.75-.75v-2.798c.22-.246.45-.48.69-.704 1.27-1.16 2.095-2.88 2.095-4.794v-.5A4.5 4.5 0 0010 1zm0 2.5a2 2 0 100 4 2 2 0 000-4z" clip-rule="evenodd" /></svg>
+                                            <span class="font-medium">Deposit:</span>
+                                            <span class="font-semibold text-gray-900">रू {{ rental.security_deposit|floatformat:2 }}</span>
+                                        </div>
+                                    </div>
+        
+                                    {% if rental.delivery_address %}
+                                        <div class="mt-3 flex items-start gap-2 text-gray-700 text-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 flex-shrink-0 text-gray-500 mt-0.5"><path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.1.4-.22.653-.369.253-.148.53-.32.81-.518.279-.198.58-.42.896-.676.317-.257.65-.544.997-.862.346-.317.71-.66 1.085-1.025l.013-.012c.375-.366.75-.75 1.125-1.154.375-.403.75-.824 1.125-1.26C18.332 10.647 18.75 9.61 18.75 8.5c0-3.45-2.8-6.25-6.25-6.25S6.25 5.05 6.25 8.5c0 1.11.418 2.147.83 3.12l.006.01.012.013c.375.365.75.73 1.125 1.026.375.403.75.824 1.125 1.26.375.403.75.824 1.125 1.261.346.317.68.604.997.862.316.257.63.518.896.676.28.198.557.37.81.518.253.149.467.269.653.369a5.741 5.741 0 00.281.14l.018.008.006.003zM10 9.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
+                                            <span class="flex-1"><strong class="font-medium">Delivery:</strong> {{ rental.delivery_address|linebreaksbr }} • {{ rental.delivery_phone }}</span>
+                                        </div>
+                                    {% endif %}
+        
+                                    {% if rental.customer_notes %}
+                                        <div class="mt-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
+                                            <strong>Notes:</strong> {{ rental.customer_notes|truncatechars:200 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+        
+                            <!-- Card Footer: Actions, Total -->
+                            <div class="mt-4 pt-4 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-between sm:items-center gap-4">
+                                <!-- Actions -->
+                                <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+                                    <a class="btn btn-secondary" href="{% url 'equipment:rental_detail' rental.rental_number %}">View details</a>
+                                    
+                                    {% if rental.status == 'pending' %}
+                                        <!-- CRITICAL FIX: Replaced form with a modal button -->
+                                        <button type="button" 
+                                                class="btn btn-danger open-action-modal" 
+                                                data-action-url="{% url 'equipment:cancel_rental' rental.rental_number %}"
+                                                data-modal-title="Cancel Rental"
+                                                data-modal-desc="Are you sure you want to cancel this rental (#{{ rental.rental_number }})? This action cannot be undone."
+                                                data-submit-text="Confirm Cancel"
+                                                data-submit-class="btn-danger"
+                                                data-show-reason="true">
+                                          Cancel
+                                        </button>
+                                    {% elif rental.status == 'active' %}
+                                        <!-- CRITICAL FIX: Replaced form with a modal button -->
+                                        <button type="button" 
+                                                class="btn btn-green open-action-modal" 
+                                                data-action-url="{% url 'equipment:return_rental' rental.rental_number %}"
+                                                data-modal-title="Return Equipment"
+                                                data-modal-desc="Please confirm you are marking this rental (#{{ rental.rental_number }}) as returned."
+                                                data-submit-text="Confirm Return"
+                                                data-submit-class="btn-green"
+                                                data-show-reason="false">
+                                          Mark as Returned
+                                        </button>
+                                    {% endif %}
+                                </div>
+        
+                                <!-- Total -->
+                                <div class="text-left sm:text-right flex-shrink-0">
+                                    <div class="text-lg font-bold text-uh-green-600">Total: रू {{ rental.total_amount|floatformat:2 }}</div>
+                                    <div class="text-sm text-gray-600">Deposit paid: {{ rental.deposit_paid|yesno:'Yes,No' }}</div>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+        
+                {# Styled Pagination #}
+                {% if page_obj and page_obj.has_other_pages %}
+                    <div class="flex items-center justify-center gap-4 mt-10">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">
+                                Previous
+                            </a>
+                        {% endif %}
+                        
+                        <span class="text-sm text-gray-600">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">
+                                Next
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+        
+            {% else %}
+                <!-- Professional Empty State -->
+                <div class="text-center p-12 bg-white rounded-lg shadow-xl">
+                    <!-- Icon: Calendar/Equipment -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400 mx-auto mb-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-18 0h18M12 15.75h.008v.008H12v-.008z" />
+                    </svg>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-2">No rentals yet</h3>
+                    <p class="text-gray-600 max-w-md mx-auto mb-6">You have not rented any equipment yet. Browse our <a href="{% url 'equipment:list' %}" class="text-uh-blue-700 font-medium hover:underline">catalog</a> to find equipment to rent.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- 
+          Reusable Action Modal 
+          This is hidden by default and shown by the JavaScript below.
+          It handles BOTH "Cancel" and "Return" actions.
+        -->
+        <div id="action-modal" class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <!-- Background overlay -->
+          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        
+          <!-- Modal panel -->
+          <div class="relative bg-white rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-lg transition-all transform scale-95 opacity-0" id="action-modal-panel">
+            <h3 class="text-xl font-semibold text-uh-blue-700" id="action-modal-title">Confirm Action</h3>
+            <p id="action-modal-desc" class="text-gray-600 mt-2">Are you sure?</p>
+        
+            <form id="action-form" method="post" action="">
+                {% csrf_token %}
+                
+                <!-- Reason field (hidden by default) -->
+                <div id="reason-field" class="mt-4 hidden">
+                    <label for="cancellation_reason" class="block text-sm font-medium text-gray-700 mb-1">Reason (optional)</label>
+                    <textarea id="cancellation_reason" name="cancellation_reason" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-uh-blue-600" placeholder="Optional note..."></textarea>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row gap-3 justify-end mt-6">
+                    <button type="button" class="btn btn-secondary w-full sm:w-auto" id="action-modal-close">
+                      Close
+                    </button>
+                    <button type="submit" class="btn w-full sm:w-auto" id="action-modal-submit">
+                      Confirm
+                    </button>
+                </div>
+            </form>
+          </div>
+        </div>
+    <!-- End of your original content block -->
+
+    </div> <!-- End #page-content -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('action-modal');
+    if (!modal) return; // Exit if modal not on page
+
+    const modalPanel = document.getElementById('action-modal-panel');
+    const actionForm = document.getElementById('action-form');
+    const modalTitle = document.getElementById('action-modal-title');
+    const modalDesc = document.getElementById('action-modal-desc');
+    const submitBtn = document.getElementById('action-modal-submit');
+    const closeBtn = document.getElementById('action-modal-close');
+    const reasonField = document.getElementById('reason-field');
+    const reasonTextarea = document.getElementById('cancellation_reason');
+
+    function openModal(e) {
+        const btn = e.currentTarget;
+        
+        // Get data from button
+        const actionUrl = btn.getAttribute('data-action-url');
+        const title = btn.getAttribute('data-modal-title');
+        const desc = btn.getAttribute('data-modal-desc');
+        const submitText = btn.getAttribute('data-submit-text');
+        const submitClass = btn.getAttribute('data-submit-class'); // e.g., 'btn-danger' or 'btn-green'
+        const showReason = btn.getAttribute('data-show-reason') === 'true';
+
+        // Set modal content
+        actionForm.action = actionUrl;
+        modalTitle.textContent = title;
+        modalDesc.textContent = desc;
+        submitBtn.textContent = submitText;
+        
+        // Reset and apply button classes
+        submitBtn.className = 'btn w-full sm:w-auto'; // Reset to base classes
+        submitBtn.classList.add(submitClass); // Add 'btn-danger' or 'btn-green'
+        
+        // Show/hide reason field
+        if (showReason) {
+            reasonField.classList.remove('hidden');
+            reasonTextarea.value = ''; // Clear textarea
+        } else {
+            reasonField.classList.add('hidden');
+        }
+
+        // Show modal
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modalPanel.classList.remove('scale-95', 'opacity-0');
+            modalPanel.classList.add('scale-100', 'opacity-100');
+        }, 10);
+        
+        if (showReason) {
+            reasonTextarea.focus();
+        }
+    }
+
+    function closeModal() {
+        modalPanel.classList.add('scale-95', 'opacity-0');
+        modalPanel.classList.remove('scale-100', 'opacity-100');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            actionForm.action = '';
+            reasonTextarea.value = '';
+        }, 200); // Wait for transition
+    }
+
+    // Attach listeners to ALL buttons that open the action modal
+    document.querySelectorAll('.open-action-modal').forEach(function(btn){
+        btn.addEventListener('click', openModal);
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+
+    // Close modal when clicking outside the panel
+    modal.addEventListener('click', function(e){
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+});
+</script>
+{% endblock %}
