@@ -57,13 +57,15 @@ Message-ID: <176320483576.13654...@mail>
 You're receiving this email because you requested a password reset for your account at UH Care.
 Click the link below to reset your password. This link is valid for 24 hours.
 
-https://127.0.0.1:8000/accounts/password_reset/MQ/7h2-1234567890abcdef/
+http://127.0.0.1:8000/accounts/reset/MTI/czbj6k-fccedaf3eac7eac28291b4dfa3af4a1d/
 
 If you didn't request a password reset, please ignore this email.
 ```
 
 3. **Copy the password reset link from the terminal output**
 4. **Paste it in your browser to complete the password reset**
+
+⚠️ **Important**: The correct URL path is `/accounts/reset/` (not `/accounts/password_reset/`)
 
 ---
 
@@ -124,7 +126,7 @@ Copy the password reset link
 
 **Step 4**: Use the link
 ```
-Paste link in browser: http://127.0.0.1:8000/accounts/password_reset/MQ/7h2-abc.../
+Paste link in browser: http://127.0.0.1:8000/accounts/reset/MTI/7h2-abc.../
 Enter new password
 Success!
 ```
