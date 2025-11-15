@@ -197,3 +197,15 @@ else:
     TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', '')
     TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '')
     TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '')
+
+# -----------------------
+# Password reset configuration
+# -----------------------
+# Token expires after 24 hours (86400 seconds)
+PASSWORD_RESET_TIMEOUT = 86400
+
+# Admin notifications - configure to receive alerts on password reset requests
+# Add admin email addresses here to be notified when users request password resets
+ADMINS = [
+    ('Adarsh Thapa', 'adarshthapa9090@gmail.com'),
+]
